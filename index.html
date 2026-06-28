@@ -545,7 +545,7 @@ h1,h2,h3,h4 { font-family:'Fraunces',serif; font-weight:300; }
           <div>
             <div class="hero-eyebrow">Esperando a</div>
             <div class="hero-name">Amelia ♡</div>
-            <div class="hero-date">2 de noviembre de 2025</div>
+            <div class="hero-date">2 de noviembre de 2026</div>
           </div>
           <div class="hero-countdown">
             <div class="hero-days" id="heroDays">—</div>
@@ -806,7 +806,7 @@ const EMAILS_AUTORIZADOS = [
 ];
 
 // ── FECHA NACIMIENTO ─────────────────────────────────
-const FECHA_PARTO = new Date('2025-11-02T00:00:00');
+const FECHA_PARTO = new Date('2026-11-02T00:00:00');
 
 // ── DATOS SEMANAS EMBARAZO ───────────────────────────
 const SEMANAS_INFO = {
@@ -887,7 +887,7 @@ function updateCountdown() {
 
   // Calcular semana (asumiendo EEG ~11 semanas antes del parto → ajusta si tienes la fecha de concepción)
   // Fecha probable de última menstruación = parto - 280 días
-  const FUM = new Date(FECHA_PARTO.getTime() - 280*24*60*60*1000);
+  const FUM = new Date('2026-01-29T00:00:00');
   const semanas = Math.min(40, Math.max(1, Math.floor((now - FUM) / (7*24*60*60*1000))));
   const pct = Math.round(semanas/40*100);
   const info = getSemanaInfo(semanas);
