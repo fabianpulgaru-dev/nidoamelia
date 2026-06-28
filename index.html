@@ -703,8 +703,18 @@ let dataEventos = {};
 // ── AUTH ──────────────────────────────────────────────
 function loginGoogle(){
   const p = new firebase.auth.GoogleAuthProvider();
-  auth.signInWithPopup(p).catch(e=>showToast('Error: '+e.message));
+  const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+  if(isSafari){
+    auth.signInWithRedirect(p).catch(e=>showToast('Error: '+e.message));
+  } else {
+    auth.signInWithPopup(p).catch(e=>showToast('Error: '+e.message));
+  }
 }
+
+// Capturar resultado del redirect al volver
+auth.getRedirectResult().then(result=>{
+  if(result && result.user) console.log('Login por redirect OK');
+}).catch(e=>{ if(e.code!=='auth/no-auth-event') showToast('Error login: '+e.message); });
 function logout(){ auth.signOut(); }
 
 auth.onAuthStateChanged(user=>{
