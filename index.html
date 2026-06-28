@@ -658,8 +658,8 @@ const fbConfig = {
   messagingSenderId: "756349145887",
   appId: "1:756349145887:web:6498233c2e0aac81a6962a"
 };
+const FB_API_KEY = fbConfig.apiKey;
 firebase.initializeApp(fbConfig);
-const auth = firebase.auth();
 const db = firebase.database();
 const storage = firebase.storage();
 
@@ -704,7 +704,6 @@ let dataLista = {};
 let dataEventos = {};
 
 // ── AUTH con GIS (sin redirect, sin popup — funciona en iOS Safari) ──
-const FB_API_KEY = 'AIzaSyDBlLHG_SDpGBboHlm3JjVd09Qx-qzAZkI';
 
 async function handleGoogleLogin(response) {
   try {
