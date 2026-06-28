@@ -1,0 +1,1446 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nido de Amelia ✦</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300;1,9..144,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+<style>
+/* ═══════════════════════════════════════════════════
+   TOKENS
+═══════════════════════════════════════════════════ */
+:root {
+  --rose: #b85c80;      --rose-d: #8f3d5e;
+  --rose-l: #f9edf3;   --rose-m: #e0a0bc;
+  --sage: #5c8f72;      --sage-d: #3d6650;
+  --sage-l: #eaf3ed;   --sage-m: #9fcab0;
+  --sand: #b07840;      --sand-d: #855a28;
+  --sand-l: #f5ece0;   --sand-m: #d4a870;
+  --ink: #241c18;       --ink2: #4a3a30; --dim: #8a7870;
+  --bg:  #fdf8f3;       --bg2: #f5ede3;  --bg3: #ede0d0;
+  --w:   #ffffff;       --bdr: #e0cfc0;  --bdr2: #ccc0b0;
+  --radius: 10px;
+}
+
+/* ═══════════════════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════════════════ */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html, body { height:100%; background:var(--bg3); font-family:'DM Sans',sans-serif; font-weight:300; color:var(--ink); font-size:14px; }
+button { font-family:'DM Sans',sans-serif; cursor:pointer; }
+input, textarea, select { font-family:'DM Sans',sans-serif; font-size:13px; }
+h1,h2,h3,h4 { font-family:'Fraunces',serif; font-weight:300; }
+
+/* ═══════════════════════════════════════════════════
+   LOGIN SCREEN
+═══════════════════════════════════════════════════ */
+#loginScreen {
+  position:fixed; inset:0; background:var(--ink);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  z-index:9999; gap:0;
+}
+.login-decor {
+  position:absolute; inset:0; overflow:hidden; pointer-events:none;
+}
+.login-decor-circle {
+  position:absolute; border-radius:50%; opacity:.06;
+}
+.login-decor-circle:nth-child(1) { width:600px; height:600px; top:-200px; left:-200px; background:var(--rose); }
+.login-decor-circle:nth-child(2) { width:400px; height:400px; bottom:-100px; right:-100px; background:var(--sage); }
+.login-box {
+  position:relative; text-align:center; padding:48px 56px;
+  background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1);
+  border-radius:20px; max-width:400px; width:90%;
+}
+.login-star { font-size:40px; color:var(--rose-m); margin-bottom:16px; display:block; line-height:1; }
+.login-box h1 { font-size:32px; color:#fdf8f3; margin-bottom:6px; }
+.login-box p { font-size:13px; color:rgba(255,255,255,.45); line-height:1.7; margin-bottom:32px; }
+.btn-google {
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  background:white; color:var(--ink); border:none;
+  padding:12px 28px; border-radius:var(--radius); font-size:14px; font-weight:500;
+  width:100%; transition:opacity .2s;
+}
+.btn-google:hover { opacity:.9; }
+.btn-google svg { width:18px; height:18px; flex-shrink:0; }
+.login-note { margin-top:16px; font-size:11px; color:rgba(255,255,255,.25); }
+
+/* ═══════════════════════════════════════════════════
+   APP SHELL
+═══════════════════════════════════════════════════ */
+#app { display:none; height:100vh; display:grid; grid-template-rows:56px 1fr; grid-template-columns:1fr; }
+#app.visible { display:grid; }
+
+/* ─── TOPBAR ─── */
+.topbar {
+  background:var(--ink); display:flex; align-items:center;
+  padding:0 20px; gap:14px; border-bottom:1px solid rgba(255,255,255,.07);
+  position:sticky; top:0; z-index:100;
+}
+.brand {
+  font-family:'Fraunces',serif; font-size:17px;
+  color:#fdf8f3; font-weight:300; display:flex; align-items:center; gap:8px;
+}
+.brand-star { color:var(--rose-m); font-size:20px; }
+.brand-sub { font-size:11px; color:rgba(255,255,255,.3); font-family:'DM Sans',sans-serif; margin-left:2px; }
+.topbar-right { margin-left:auto; display:flex; align-items:center; gap:10px; }
+.user-chip {
+  display:flex; align-items:center; gap:8px;
+  background:rgba(255,255,255,.08); border-radius:100px; padding:4px 12px 4px 4px;
+}
+.user-avatar {
+  width:28px; height:28px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:500; flex-shrink:0;
+}
+.av-f { background:var(--rose-l); color:var(--rose-d); }
+.av-p { background:var(--sage-l); color:var(--sage-d); }
+.user-name { font-size:12px; color:rgba(255,255,255,.6); }
+.btn-logout {
+  background:transparent; border:none; color:rgba(255,255,255,.3);
+  font-size:11px; padding:4px 8px; border-radius:6px; transition:all .2s;
+}
+.btn-logout:hover { color:rgba(255,255,255,.7); background:rgba(255,255,255,.07); }
+
+/* ─── BODY LAYOUT ─── */
+.body-wrap { display:grid; grid-template-columns:220px 1fr; overflow:hidden; height:100%; }
+
+/* ─── SIDEBAR NAV ─── */
+.sidebar {
+  background:var(--bg2); border-right:1px solid var(--bdr);
+  display:flex; flex-direction:column; overflow:hidden;
+}
+.sidebar-logo { padding:20px 18px 14px; border-bottom:1px solid var(--bdr); }
+.sidebar-logo .countdown-mini { font-family:'Fraunces',serif; font-size:28px; color:var(--rose-d); line-height:1; }
+.sidebar-logo .countdown-lbl { font-size:10px; color:var(--dim); letter-spacing:2px; text-transform:uppercase; }
+.sidebar-logo .countdown-sub { font-size:11px; color:var(--dim); margin-top:2px; }
+
+.nav-list { flex:1; padding:10px 10px; overflow-y:auto; }
+.nav-item {
+  display:flex; align-items:center; gap:10px; padding:9px 12px;
+  border-radius:var(--radius); cursor:pointer; transition:all .15s;
+  color:var(--ink2); font-size:13px; margin-bottom:2px;
+  border:1px solid transparent;
+}
+.nav-item:hover { background:var(--w); border-color:var(--bdr); }
+.nav-item.active { background:var(--rose-l); border-color:var(--rose-m); color:var(--rose-d); }
+.nav-icon { font-size:17px; width:22px; text-align:center; flex-shrink:0; }
+.nav-badge {
+  margin-left:auto; background:var(--rose); color:white;
+  font-size:10px; padding:1px 6px; border-radius:100px; font-weight:500;
+}
+
+.sidebar-footer { padding:12px; border-top:1px solid var(--bdr); }
+.week-pill {
+  background:var(--w); border:1px solid var(--bdr); border-radius:var(--radius);
+  padding:10px 12px; display:flex; align-items:center; gap:10px;
+}
+.week-num { font-family:'Fraunces',serif; font-size:24px; color:var(--rose-d); line-height:1; }
+.week-info { font-size:11px; color:var(--dim); line-height:1.5; }
+.week-prog { height:3px; background:var(--bg3); border-radius:100px; overflow:hidden; margin-top:4px; }
+.week-prog-fill { height:100%; background:var(--rose); border-radius:100px; }
+
+/* ─── MAIN CONTENT ─── */
+.main { overflow-y:auto; background:var(--bg); }
+.section { display:none; padding:28px 32px; max-width:900px; }
+.section.active { display:block; }
+.section-header { margin-bottom:22px; }
+.section-header h2 { font-size:26px; color:var(--ink); margin-bottom:4px; }
+.section-header p { font-size:13px; color:var(--dim); }
+
+/* ═══════════════════════════════════════════════════
+   SHARED UI ELEMENTS
+═══════════════════════════════════════════════════ */
+.btn { display:inline-flex; align-items:center; gap:6px; padding:9px 16px; border-radius:var(--radius); border:none; font-size:13px; font-weight:500; transition:all .2s; }
+.btn-rose { background:var(--rose); color:white; }
+.btn-rose:hover { background:var(--rose-d); }
+.btn-sage { background:var(--sage); color:white; }
+.btn-sage:hover { background:var(--sage-d); }
+.btn-outline { background:transparent; border:1px solid var(--bdr); color:var(--ink2); }
+.btn-outline:hover { border-color:var(--bdr2); background:var(--w); }
+.btn-ghost { background:transparent; border:none; color:var(--dim); font-size:12px; }
+.btn-ghost:hover { color:var(--rose-d); }
+.btn-sm { padding:5px 10px; font-size:11px; }
+.btn-danger { background:transparent; border:1px solid #f0c0c0; color:#c04040; }
+.btn-danger:hover { background:#fce8e8; }
+
+.card { background:var(--w); border:1px solid var(--bdr); border-radius:12px; }
+.chip { display:inline-block; font-size:10px; font-weight:500; padding:2px 8px; border-radius:100px; }
+.chip-f { background:var(--rose-l); color:var(--rose-d); }
+.chip-p { background:var(--sage-l); color:var(--sage-d); }
+.chip-amb { background:var(--sand-l); color:var(--sand-d); }
+.chip-done { background:#e8f2ec; color:#3d6650; }
+.chip-pend { background:var(--bg3); color:var(--dim); }
+
+.form-row { margin-bottom:14px; }
+.form-row label { display:block; font-size:11px; color:var(--dim); letter-spacing:1px; text-transform:uppercase; margin-bottom:5px; font-weight:500; }
+.form-row input, .form-row textarea, .form-row select {
+  width:100%; padding:9px 12px; border:1px solid var(--bdr); border-radius:var(--radius);
+  background:var(--bg); color:var(--ink); font-size:13px; transition:border-color .2s;
+  appearance:none; -webkit-appearance:none;
+}
+.form-row input:focus, .form-row textarea:focus, .form-row select:focus {
+  outline:none; border-color:var(--rose-m); background:var(--w);
+}
+.form-row textarea { resize:vertical; min-height:80px; line-height:1.6; }
+.form-row select { background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238a7870' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 10px center; padding-right:32px; }
+
+/* Modales */
+.modal-overlay {
+  position:fixed; inset:0; background:rgba(36,28,24,.5); z-index:1000;
+  display:flex; align-items:center; justify-content:center; padding:20px;
+  backdrop-filter:blur(2px);
+}
+.modal {
+  background:var(--w); border-radius:14px; padding:28px;
+  max-width:480px; width:100%; box-shadow:0 20px 60px rgba(0,0,0,.15);
+  max-height:90vh; overflow-y:auto;
+}
+.modal h3 { font-size:20px; color:var(--ink); margin-bottom:18px; }
+.modal-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:20px; }
+
+/* Empty state */
+.empty-state {
+  text-align:center; padding:48px 24px; color:var(--dim);
+}
+.empty-state .empty-icon { font-size:36px; margin-bottom:12px; opacity:.3; }
+.empty-state h4 { font-size:16px; color:var(--ink2); margin-bottom:6px; font-family:'Fraunces',serif; font-weight:300; }
+.empty-state p { font-size:12px; line-height:1.7; }
+
+/* Toast */
+.toast {
+  position:fixed; bottom:24px; right:24px; z-index:9999;
+  background:var(--ink); color:white; padding:10px 18px;
+  border-radius:var(--radius); font-size:13px;
+  display:flex; align-items:center; gap:8px;
+  box-shadow:0 4px 16px rgba(0,0,0,.2);
+  transform:translateY(80px); opacity:0; transition:all .3s;
+}
+.toast.show { transform:translateY(0); opacity:1; }
+.toast-dot { width:6px; height:6px; border-radius:50%; background:var(--sage-m); flex-shrink:0; }
+
+/* ═══════════════════════════════════════════════════
+   SECCIÓN INICIO (DASHBOARD)
+═══════════════════════════════════════════════════ */
+.hero-banner {
+  background:var(--ink); border-radius:14px; padding:24px 28px;
+  margin-bottom:18px; display:grid; grid-template-columns:1fr auto; gap:20px; align-items:center;
+  position:relative; overflow:hidden;
+}
+.hero-banner::before {
+  content:''; position:absolute; width:300px; height:300px;
+  border-radius:50%; background:var(--rose); opacity:.07;
+  top:-100px; right:-80px;
+}
+.hero-eyebrow { font-size:10px; letter-spacing:3px; text-transform:uppercase; color:var(--rose-m); margin-bottom:8px; }
+.hero-name { font-family:'Fraunces',serif; font-size:30px; color:#fdf8f3; font-weight:300; line-height:1.1; margin-bottom:4px; }
+.hero-date { font-size:12px; color:rgba(255,255,255,.35); }
+.hero-countdown { text-align:center; position:relative; }
+.hero-days { font-family:'Fraunces',serif; font-size:52px; color:var(--rose-m); line-height:1; }
+.hero-days-lbl { font-size:10px; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,.3); margin-top:2px; }
+
+.dash-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.dash-card { background:var(--w); border:1px solid var(--bdr); border-radius:12px; padding:16px 18px; }
+.dash-card-title {
+  font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--dim);
+  margin-bottom:12px; display:flex; align-items:center; gap:6px;
+}
+.dash-card-title span { font-size:13px; }
+
+/* Semana widget */
+.week-widget { display:flex; gap:12px; align-items:flex-start; }
+.week-circle-big {
+  width:60px; height:60px; border-radius:50%; flex-shrink:0;
+  background:var(--rose-l); border:2px solid var(--rose-m);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+}
+.week-circle-big .wn { font-family:'Fraunces',serif; font-size:22px; color:var(--rose-d); line-height:1; }
+.week-circle-big .ws { font-size:9px; text-transform:uppercase; letter-spacing:1px; color:var(--rose-d); }
+.week-detail h4 { font-size:13px; font-weight:500; margin-bottom:3px; }
+.week-detail p { font-size:11px; color:var(--dim); line-height:1.6; }
+.week-bar-wrap { margin-top:8px; }
+.week-bar-row { height:4px; background:var(--bg3); border-radius:100px; overflow:hidden; }
+.week-bar-row-fill { height:100%; background:var(--rose); border-radius:100px; }
+
+/* Stats mini */
+.stats-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
+.stat-mini { background:var(--bg); border-radius:var(--radius); padding:10px 12px; text-align:center; }
+.stat-mini .num { font-family:'Fraunces',serif; font-size:24px; color:var(--ink); line-height:1; }
+.stat-mini .lbl { font-size:10px; color:var(--dim); margin-top:2px; }
+
+/* Tareas recientes */
+.task-mini { display:flex; align-items:center; gap:8px; padding:6px 0; border-bottom:1px solid var(--bg2); }
+.task-mini:last-child { border-bottom:none; }
+.t-cb { width:16px; height:16px; border-radius:50%; border:1.5px solid var(--bdr); flex-shrink:0; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .2s; }
+.t-cb.done { background:var(--sage); border-color:var(--sage); }
+.t-cb.done::after { content:'✓'; font-size:9px; color:white; line-height:1; }
+.t-label { flex:1; font-size:12px; }
+.t-label.done { text-decoration:line-through; color:var(--dim); }
+.t-meta { display:flex; gap:4px; align-items:center; flex-shrink:0; }
+
+/* Notas recientes */
+.nota-mini { background:var(--sand-l); border:1px solid var(--sand-m); border-radius:8px; padding:10px 12px; margin-bottom:6px; }
+.nota-mini-author { font-size:10px; color:var(--sand-d); margin-bottom:3px; font-weight:500; }
+.nota-mini-text { font-size:12px; color:var(--ink2); line-height:1.5; }
+
+/* ═══════════════════════════════════════════════════
+   SECCIÓN TAREAS
+═══════════════════════════════════════════════════ */
+.tasks-toolbar { display:flex; gap:8px; align-items:center; margin-bottom:18px; flex-wrap:wrap; }
+.filter-pills { display:flex; gap:4px; }
+.filter-pill {
+  padding:5px 12px; border-radius:100px; font-size:11px; font-weight:500;
+  border:1px solid var(--bdr); background:var(--w); color:var(--dim); cursor:pointer; transition:all .2s;
+}
+.filter-pill.active { background:var(--rose-l); border-color:var(--rose-m); color:var(--rose-d); }
+
+.task-group { margin-bottom:20px; }
+.task-group-title {
+  font-size:10px; letter-spacing:3px; text-transform:uppercase; color:var(--dim);
+  margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid var(--bdr);
+}
+.task-card {
+  background:var(--w); border:1px solid var(--bdr); border-radius:var(--radius);
+  padding:12px 14px; margin-bottom:6px; display:flex; gap:10px; align-items:flex-start;
+  transition:all .15s; border-left:3px solid transparent;
+}
+.task-card:hover { border-color:var(--bdr2); }
+.task-card.done { opacity:.6; }
+.task-card.prio-alta { border-left-color:var(--rose); }
+.task-card.prio-media { border-left-color:var(--sand); }
+.task-card.prio-baja { border-left-color:var(--sage); }
+.task-cb { width:18px; height:18px; border-radius:50%; border:1.5px solid var(--bdr); flex-shrink:0; cursor:pointer; display:flex; align-items:center; justify-content:center; margin-top:1px; transition:all .2s; }
+.task-cb.done { background:var(--sage); border-color:var(--sage); }
+.task-cb.done::after { content:'✓'; font-size:10px; color:white; }
+.task-body { flex:1; min-width:0; }
+.task-name { font-size:13px; font-weight:500; color:var(--ink); margin-bottom:3px; }
+.task-name.done { text-decoration:line-through; color:var(--dim); }
+.task-desc { font-size:11px; color:var(--dim); line-height:1.5; margin-bottom:5px; }
+.task-footer { display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+.task-due { font-size:11px; color:var(--dim); }
+.task-due.vencida { color:#c04040; font-weight:500; }
+.task-actions { display:flex; gap:4px; flex-shrink:0; }
+
+/* ═══════════════════════════════════════════════════
+   SECCIÓN HITOS
+═══════════════════════════════════════════════════ */
+.timeline { position:relative; padding-left:28px; }
+.timeline::before {
+  content:''; position:absolute; left:10px; top:0; bottom:0;
+  width:2px; background:var(--bdr); border-radius:1px;
+}
+.hito-item {
+  position:relative; margin-bottom:16px; padding:14px 16px;
+  background:var(--w); border:1px solid var(--bdr); border-radius:var(--radius);
+}
+.hito-dot {
+  position:absolute; left:-23px; top:18px; width:12px; height:12px;
+  border-radius:50%; border:2px solid var(--bdr); background:var(--w);
+}
+.hito-dot.done { background:var(--sage); border-color:var(--sage); }
+.hito-dot.next { background:var(--rose); border-color:var(--rose); }
+.hito-dot.pending { background:var(--w); border-color:var(--bdr2); }
+.hito-top { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; margin-bottom:4px; }
+.hito-name { font-size:14px; font-weight:500; color:var(--ink); }
+.hito-fecha { font-size:11px; color:var(--dim); }
+.hito-desc { font-size:12px; color:var(--dim); line-height:1.6; margin-bottom:6px; }
+.hito-status-done { color:var(--sage-d); font-size:11px; font-weight:500; }
+.hito-status-next { color:var(--rose-d); font-size:11px; font-weight:500; }
+
+/* ═══════════════════════════════════════════════════
+   SECCIÓN GALERÍA
+═══════════════════════════════════════════════════ */
+.gallery-toolbar { display:flex; gap:8px; align-items:center; margin-bottom:18px; }
+.gallery-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(160px,1fr)); gap:10px; }
+.foto-card {
+  background:var(--bg2); border-radius:10px; overflow:hidden;
+  border:1px solid var(--bdr); cursor:pointer; position:relative; group:true;
+}
+.foto-card img { width:100%; aspect-ratio:1; object-fit:cover; display:block; }
+.foto-card-info { padding:8px 10px; }
+.foto-card-title { font-size:11px; font-weight:500; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.foto-card-date { font-size:10px; color:var(--dim); }
+.foto-card-del {
+  position:absolute; top:6px; right:6px; width:24px; height:24px;
+  background:rgba(36,28,24,.7); border:none; border-radius:50%;
+  color:white; font-size:13px; display:none; align-items:center; justify-content:center;
+  cursor:pointer; line-height:1;
+}
+.foto-card:hover .foto-card-del { display:flex; }
+.drop-zone {
+  border:2px dashed var(--bdr); border-radius:12px; padding:32px; text-align:center;
+  cursor:pointer; transition:all .2s; margin-bottom:16px; background:var(--w);
+}
+.drop-zone:hover, .drop-zone.drag { border-color:var(--rose-m); background:var(--rose-l); }
+.drop-zone p { font-size:13px; color:var(--dim); line-height:1.7; }
+.drop-zone strong { color:var(--rose-d); }
+.foto-lightbox {
+  position:fixed; inset:0; background:rgba(24,18,14,.9); z-index:2000;
+  display:none; align-items:center; justify-content:center; padding:20px;
+}
+.foto-lightbox.show { display:flex; }
+.foto-lightbox img { max-width:90vw; max-height:85vh; border-radius:10px; object-fit:contain; }
+.foto-lightbox-close {
+  position:absolute; top:16px; right:20px; background:none; border:none;
+  color:white; font-size:28px; cursor:pointer; opacity:.7; line-height:1;
+}
+.foto-lightbox-close:hover { opacity:1; }
+
+/* ═══════════════════════════════════════════════════
+   SECCIÓN NOTAS
+═══════════════════════════════════════════════════ */
+.notas-layout { display:grid; grid-template-columns:1fr 280px; gap:16px; }
+.nota-card {
+  background:var(--w); border:1px solid var(--bdr); border-radius:12px;
+  padding:18px 20px; margin-bottom:10px; cursor:pointer; transition:all .2s;
+}
+.nota-card:hover { border-color:var(--bdr2); }
+.nota-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; }
+.nota-author-chip { display:flex; align-items:center; gap:6px; }
+.nota-author-avatar { width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:500; flex-shrink:0; }
+.nota-author-name { font-size:11px; font-weight:500; }
+.nota-date { font-size:10px; color:var(--dim); }
+.nota-card-text { font-size:13px; color:var(--ink2); line-height:1.7; }
+.nota-card-mood { font-size:16px; margin-top:8px; }
+
+.nota-form-card { background:var(--w); border:1px solid var(--bdr); border-radius:12px; padding:16px; position:sticky; top:16px; }
+.nota-form-card h4 { font-size:13px; font-weight:500; margin-bottom:12px; color:var(--ink); }
+.mood-row { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px; }
+.mood-btn {
+  width:32px; height:32px; border-radius:50%; border:2px solid var(--bdr);
+  font-size:16px; background:transparent; cursor:pointer; transition:all .15s;
+  display:flex; align-items:center; justify-content:center;
+}
+.mood-btn.selected { border-color:var(--rose-m); background:var(--rose-l); }
+
+/* ═══════════════════════════════════════════════════
+   SECCIÓN LISTA DE COMPRAS
+═══════════════════════════════════════════════════ */
+.lista-layout { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.lista-cat { background:var(--w); border:1px solid var(--bdr); border-radius:12px; overflow:hidden; }
+.lista-cat-header { padding:12px 14px; border-bottom:1px solid var(--bdr); display:flex; align-items:center; gap:8px; }
+.lista-cat-title { font-size:13px; font-weight:500; flex:1; }
+.lista-cat-count { font-size:10px; color:var(--dim); }
+.lista-items { padding:4px 0; }
+.lista-item { display:flex; align-items:center; gap:8px; padding:8px 14px; border-bottom:1px solid var(--bg2); transition:background .15s; }
+.lista-item:last-child { border-bottom:none; }
+.lista-item:hover { background:var(--bg); }
+.l-cb { width:16px; height:16px; border-radius:4px; border:1.5px solid var(--bdr); flex-shrink:0; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .2s; }
+.l-cb.done { background:var(--sage); border-color:var(--sage); }
+.l-cb.done::after { content:'✓'; font-size:9px; color:white; }
+.l-text { flex:1; font-size:12px; color:var(--ink); }
+.l-text.done { text-decoration:line-through; color:var(--dim); }
+.l-tag { font-size:10px; color:var(--dim); }
+.l-del { background:none; border:none; color:var(--bdr2); font-size:14px; cursor:pointer; opacity:0; transition:opacity .15s; line-height:1; padding:0 2px; }
+.lista-item:hover .l-del { opacity:1; }
+.lista-add-row { display:flex; gap:6px; padding:8px 14px; }
+.lista-add-input { flex:1; padding:6px 10px; border:1px solid var(--bdr); border-radius:6px; font-size:12px; background:var(--bg); color:var(--ink); }
+.lista-add-input:focus { outline:none; border-color:var(--rose-m); }
+
+/* ═══════════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════════ */
+@media (max-width: 720px) {
+  .body-wrap { grid-template-columns:1fr; }
+  .sidebar { display:none; }
+  .dash-grid, .notas-layout, .lista-layout { grid-template-columns:1fr; }
+  .section { padding:16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     LOGIN
+══════════════════════════════════════ -->
+<div id="loginScreen">
+  <div class="login-decor">
+    <div class="login-decor-circle"></div>
+    <div class="login-decor-circle"></div>
+  </div>
+  <div class="login-box">
+    <span class="login-star">✦</span>
+    <h1>Nido de Amelia</h1>
+    <p>El espacio compartido de nuestra familia, mientras esperamos a Amelia.</p>
+    <button class="btn-google" onclick="loginGoogle()">
+      <svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/></svg>
+      Ingresar con Google
+    </button>
+    <p class="login-note">Solo Fabián y su pareja tienen acceso.</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     APP
+══════════════════════════════════════ -->
+<div id="app">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="brand">
+      <span class="brand-star">✦</span>
+      Nido de Amelia
+      <span class="brand-sub">· familia Pulgar</span>
+    </div>
+    <div class="topbar-right">
+      <div class="user-chip" id="userChip" style="display:none;">
+        <div class="user-avatar" id="userAvatarTop"></div>
+        <span class="user-name" id="userNameTop"></span>
+      </div>
+      <button class="btn-logout" onclick="logout()">Salir</button>
+    </div>
+  </div>
+
+  <div class="body-wrap">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sidebar-logo">
+        <div class="countdown-lbl">Esperando a Amelia</div>
+        <div class="countdown-mini" id="sidebarDays">—</div>
+        <div class="countdown-sub">días que faltan ♡</div>
+      </div>
+
+      <nav class="nav-list">
+        <div class="nav-item active" onclick="navTo('inicio')">
+          <span class="nav-icon">🏠</span> Inicio
+        </div>
+        <div class="nav-item" onclick="navTo('tareas')">
+          <span class="nav-icon">✅</span> Tareas
+          <span class="nav-badge" id="badgeTareas" style="display:none;">0</span>
+        </div>
+        <div class="nav-item" onclick="navTo('hitos')">
+          <span class="nav-icon">🌟</span> Hitos
+        </div>
+        <div class="nav-item" onclick="navTo('galeria')">
+          <span class="nav-icon">📷</span> Galería
+        </div>
+        <div class="nav-item" onclick="navTo('notas')">
+          <span class="nav-icon">📓</span> Notas
+        </div>
+        <div class="nav-item" onclick="navTo('lista')">
+          <span class="nav-icon">🛍</span> Lista de compras
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="week-pill">
+          <div class="week-num" id="sidebarWeek">—</div>
+          <div class="week-info">
+            <div style="font-size:11px;font-weight:500;color:var(--ink);">Semana de embarazo</div>
+            <div style="font-size:10px;color:var(--dim);" id="sidebarTrimestre">—</div>
+            <div class="week-prog"><div class="week-prog-fill" id="sidebarProgFill" style="width:0%"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN -->
+    <main class="main">
+
+      <!-- ── INICIO ── -->
+      <div class="section active" id="sec-inicio">
+        <div class="hero-banner">
+          <div>
+            <div class="hero-eyebrow">Esperando a</div>
+            <div class="hero-name">Amelia ♡</div>
+            <div class="hero-date">2 de noviembre de 2025</div>
+          </div>
+          <div class="hero-countdown">
+            <div class="hero-days" id="heroDays">—</div>
+            <div class="hero-days-lbl">días</div>
+          </div>
+        </div>
+
+        <div class="dash-grid">
+          <!-- Semana -->
+          <div class="dash-card">
+            <div class="dash-card-title"><span>🌱</span> Desarrollo de Amelia</div>
+            <div class="week-widget">
+              <div class="week-circle-big">
+                <div class="wn" id="dashWeekNum">—</div>
+                <div class="ws">sem</div>
+              </div>
+              <div class="week-detail">
+                <h4 id="dashWeekTitle">Calculando…</h4>
+                <p id="dashWeekDesc"></p>
+                <div class="week-bar-wrap">
+                  <div style="display:flex;justify-content:space-between;margin-bottom:3px;">
+                    <span style="font-size:10px;color:var(--dim);">Sem 1</span>
+                    <span style="font-size:10px;color:var(--dim);" id="dashWeekPct">0%</span>
+                    <span style="font-size:10px;color:var(--dim);">Sem 40</span>
+                  </div>
+                  <div class="week-bar-row"><div class="week-bar-row-fill" id="dashWeekBar" style="width:0%"></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tareas rápidas -->
+          <div class="dash-card">
+            <div class="dash-card-title"><span>✅</span> Próximas tareas</div>
+            <div id="dashTareas"><div class="empty-state" style="padding:12px 0;"><p>Sin tareas aún</p></div></div>
+          </div>
+
+          <!-- Stats -->
+          <div class="dash-card">
+            <div class="dash-card-title"><span>📊</span> Resumen</div>
+            <div class="stats-row">
+              <div class="stat-mini"><div class="num" id="statTareasDone">0</div><div class="lbl">Tareas listas</div></div>
+              <div class="stat-mini"><div class="num" id="statTareasPend">0</div><div class="lbl">Pendientes</div></div>
+              <div class="stat-mini"><div class="num" id="statFotos">0</div><div class="lbl">Fotos</div></div>
+            </div>
+            <div style="margin-top:12px;">
+              <div class="stats-row" style="grid-template-columns:1fr 1fr;">
+                <div class="stat-mini"><div class="num" id="statHitosDone">0</div><div class="lbl">Hitos logrados</div></div>
+                <div class="stat-mini"><div class="num" id="statNotas">0</div><div class="lbl">Notas escritas</div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Nota reciente -->
+          <div class="dash-card">
+            <div class="dash-card-title"><span>📓</span> Última nota</div>
+            <div id="dashNota"><div class="empty-state" style="padding:12px 0;"><p>Escribe la primera nota ♡</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── TAREAS ── -->
+      <div class="section" id="sec-tareas">
+        <div class="section-header">
+          <h2>Tareas</h2>
+          <p>Todo lo que hay que organizar antes de que llegue Amelia.</p>
+        </div>
+        <div class="tasks-toolbar">
+          <div class="filter-pills">
+            <div class="filter-pill active" onclick="filterTareas('todas')">Todas</div>
+            <div class="filter-pill" onclick="filterTareas('pendiente')">Pendientes</div>
+            <div class="filter-pill" onclick="filterTareas('done')">Listas</div>
+            <div class="filter-pill" onclick="filterTareas('fab')">Fabián</div>
+            <div class="filter-pill" onclick="filterTareas('fio')">Fiorella</div>
+          </div>
+          <button class="btn btn-rose" onclick="abrirModalTarea()" style="margin-left:auto;">+ Nueva tarea</button>
+        </div>
+        <div id="tareasList"></div>
+      </div>
+
+      <!-- ── HITOS ── -->
+      <div class="section" id="sec-hitos">
+        <div class="section-header">
+          <h2>Hitos del embarazo</h2>
+          <p>Los momentos importantes del camino hacia Amelia.</p>
+        </div>
+        <div style="display:flex;justify-content:flex-end;margin-bottom:16px;">
+          <button class="btn btn-rose" onclick="abrirModalHito()">+ Agregar hito</button>
+        </div>
+        <div class="timeline" id="hitosList"></div>
+      </div>
+
+      <!-- ── GALERÍA ── -->
+      <div class="section" id="sec-galeria">
+        <div class="section-header">
+          <h2>Galería de Amelia</h2>
+          <p>Fotos del embarazo, ecografías y preparativos.</p>
+        </div>
+        <div class="drop-zone" id="dropZone" onclick="document.getElementById('fotoInput').click()">
+          <p>📷 <strong>Arrastra fotos aquí</strong> o haz clic para subir<br>JPG, PNG · Múltiples archivos</p>
+        </div>
+        <input type="file" id="fotoInput" multiple accept="image/*" style="display:none;" onchange="subirFotos(this.files)">
+        <div class="gallery-grid" id="galleryGrid"></div>
+      </div>
+
+      <!-- ── NOTAS ── -->
+      <div class="section" id="sec-notas">
+        <div class="section-header">
+          <h2>Notas y diario</h2>
+          <p>Pensamientos, sentimientos y momentos especiales.</p>
+        </div>
+        <div class="notas-layout">
+          <div id="notasList"></div>
+          <div>
+            <div class="nota-form-card">
+              <h4>✍️ Escribir una nota</h4>
+              <div class="form-row">
+                <label>Estado de ánimo</label>
+                <div class="mood-row" id="moodRow">
+                  <button class="mood-btn" onclick="selectMood(this,'🥰')">🥰</button>
+                  <button class="mood-btn" onclick="selectMood(this,'😊')">😊</button>
+                  <button class="mood-btn" onclick="selectMood(this,'😌')">😌</button>
+                  <button class="mood-btn" onclick="selectMood(this,'🤔')">🤔</button>
+                  <button class="mood-btn" onclick="selectMood(this,'😴')">😴</button>
+                  <button class="mood-btn" onclick="selectMood(this,'😢')">😢</button>
+                </div>
+              </div>
+              <div class="form-row">
+                <label>Nota</label>
+                <textarea id="notaText" placeholder="¿Qué quieres recordar de hoy?" style="min-height:100px;"></textarea>
+              </div>
+              <button class="btn btn-rose" style="width:100%;" onclick="guardarNota()">Guardar nota</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── LISTA DE COMPRAS ── -->
+      <div class="section" id="sec-lista">
+        <div class="section-header">
+          <h2>Lista de compras</h2>
+          <p>Todo lo que Amelia va a necesitar.</p>
+        </div>
+        <div class="lista-layout" id="listaGrid"></div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     MODALES
+══════════════════════════════════════ -->
+<!-- Modal Tarea -->
+<div class="modal-overlay" id="modalTarea" style="display:none;" onclick="if(event.target===this)cerrarModalTarea()">
+  <div class="modal">
+    <h3 id="modalTareaTitulo">Nueva tarea</h3>
+    <div class="form-row"><label>Nombre de la tarea</label><input type="text" id="tareaName" placeholder="Ej: Comprar cuna"></div>
+    <div class="form-row"><label>Descripción (opcional)</label><textarea id="tareaDesc" placeholder="Detalles adicionales…" style="min-height:60px;"></textarea></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="form-row">
+        <label>Responsable</label>
+        <select id="tareaResp">
+          <option value="amb">Ambos</option>
+          <option value="fab">Fabián</option>
+          <option value="fio">Fiorella</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>Prioridad</label>
+        <select id="tareaPrio">
+          <option value="media">Media</option>
+          <option value="alta">Alta</option>
+          <option value="baja">Baja</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row"><label>Fecha límite</label><input type="date" id="tareaFecha"></div>
+    <div class="form-row">
+      <label>Categoría</label>
+      <select id="tareaCat">
+        <option value="Médico">Médico / Salud</option>
+        <option value="Equipamiento">Equipamiento</option>
+        <option value="Ropa">Ropa y accesorios</option>
+        <option value="Papeleo">Papeleo y trámites</option>
+        <option value="Espacio">Espacio del bebé</option>
+        <option value="Otro">Otro</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="cerrarModalTarea()">Cancelar</button>
+      <button class="btn btn-rose" onclick="guardarTarea()">Guardar tarea</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Hito -->
+<div class="modal-overlay" id="modalHito" style="display:none;" onclick="if(event.target===this)cerrarModalHito()">
+  <div class="modal">
+    <h3>Agregar hito</h3>
+    <div class="form-row"><label>Nombre del hito</label><input type="text" id="hitoName" placeholder="Ej: Primera ecografía"></div>
+    <div class="form-row"><label>Descripción</label><textarea id="hitoDesc" placeholder="Qué pasó, cómo te sentiste…"></textarea></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="form-row"><label>Fecha</label><input type="date" id="hitoFecha"></div>
+      <div class="form-row">
+        <label>Estado</label>
+        <select id="hitoStatus">
+          <option value="done">Completado ✓</option>
+          <option value="next">Próximo</option>
+          <option value="pending">Pendiente</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <label>Semana de embarazo (opcional)</label>
+      <input type="number" id="hitoSemana" min="1" max="40" placeholder="Ej: 20">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="cerrarModalHito()">Cancelar</button>
+      <button class="btn btn-rose" onclick="guardarHito()">Guardar hito</button>
+    </div>
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div class="foto-lightbox" id="lightbox" onclick="cerrarLightbox()">
+  <button class="foto-lightbox-close" onclick="cerrarLightbox()">×</button>
+  <img id="lightboxImg" src="" alt="">
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"><span class="toast-dot"></span><span id="toastMsg">Guardado</span></div>
+
+<!-- ══════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════ -->
+<script>
+// ── FIREBASE CONFIG ──────────────────────────────────
+const fbConfig = {
+  apiKey: "AIzaSyDBlLHG_SDpGBboHlm3JjVd09Qx-qzAZkI",
+  authDomain: "ee12026-f5e3d.firebaseapp.com",
+  databaseURL: "https://ee12026-f5e3d-default-rtdb.firebaseio.com",
+  projectId: "ee12026-f5e3d",
+  storageBucket: "ee12026-f5e3d.firebasestorage.app",
+  messagingSenderId: "756349145887",
+  appId: "1:756349145887:web:6498233c2e0aac81a6962a"  
+};
+
+firebase.initializeApp(fbConfig);
+const auth    = firebase.auth();
+const db      = firebase.database();
+const storage = firebase.storage();
+
+// ── USUARIOS AUTORIZADOS (emails) ─────────────────────
+const EMAILS_AUTORIZADOS = [
+  'fabianpulgaru@gmail.com',
+  // agrega aquí el email de tu pareja
+];
+
+// ── FECHA NACIMIENTO ─────────────────────────────────
+const FECHA_PARTO = new Date('2025-11-02T00:00:00');
+
+// ── DATOS SEMANAS EMBARAZO ───────────────────────────
+const SEMANAS_INFO = {
+  4:  { titulo:'Semana 4 · Primer trimestre', desc:'El embrión se está implantando. ¡Justo cuando se confirma el embarazo!' },
+  8:  { titulo:'Semana 8 · Primer trimestre', desc:'El corazón ya late. Los rasgos faciales se empiezan a formar.' },
+  12: { titulo:'Semana 12 · Primer trimestre', desc:'¡Fin del primer trimestre! El riesgo de pérdida disminuye notablemente.' },
+  16: { titulo:'Semana 16 · Segundo trimestre', desc:'Puede sentir movimientos suaves. Los genitales ya son visibles.' },
+  20: { titulo:'Semana 20 · Segundo trimestre', desc:'¡La mitad del camino! Ecografía morfológica, confirmación del sexo.' },
+  24: { titulo:'Semana 24 · Segundo trimestre', desc:'Amelia ya puede oír. Sus ojos empiezan a abrirse.' },
+  27: { titulo:'Semana 27 · Tercer trimestre', desc:'Mide ~36 cm y pesa ~875g. ¡Puede reconocer tu voz!' },
+  28: { titulo:'Semana 28 · Tercer trimestre', desc:'El cerebro crece rápidamente. Los pulmones se preparan para respirar.' },
+  32: { titulo:'Semana 32 · Tercer trimestre', desc:'Se posiciona de cabeza. Sus uñas y cabello ya están formados.' },
+  36: { titulo:'Semana 36 · Recta final', desc:'¡Casi a término! El bebé baja en la pelvis.' },
+  40: { titulo:'Semana 40 · ¡El gran día!', desc:'Amelia está lista para llegar al mundo. ¡Ánimo!' },
+};
+
+function getSemanaInfo(sem) {
+  let keys = Object.keys(SEMANAS_INFO).map(Number).sort((a,b)=>a-b);
+  let closest = keys[0];
+  for (let k of keys) { if (sem >= k) closest = k; }
+  return SEMANAS_INFO[closest] || { titulo:'Embarazo en curso', desc:'Cada semana es un paso más hacia Amelia.' };
+}
+
+// ── ESTADO LOCAL ─────────────────────────────────────
+let currentUser = null;
+let tareasFiltro = 'todas';
+let tareaEditing = null;
+let moodSelected = '';
+let dataTareas = {};
+let dataHitos  = {};
+let dataNotas  = {};
+let dataGaleria = {};
+let dataLista   = {};
+
+// ── AUTH ─────────────────────────────────────────────
+function loginGoogle() {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider).catch(err => showToast('Error: ' + err.message));
+}
+
+function logout() {
+  auth.signOut();
+}
+
+auth.onAuthStateChanged(user => {
+  if (user) {
+    if (EMAILS_AUTORIZADOS.length > 0 && !EMAILS_AUTORIZADOS.includes(user.email)) {
+      auth.signOut();
+      showToast('Acceso no autorizado para ' + user.email);
+      return;
+    }
+    currentUser = user;
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('app').classList.add('visible');
+    // user chip
+    const chip = document.getElementById('userChip');
+    chip.style.display = 'flex';
+    const av = document.getElementById('userAvatarTop');
+    const isFab = user.email === 'fabianpulgaru@gmail.com';
+    av.className = 'user-avatar ' + (isFab ? 'av-p' : 'av-f');
+    av.textContent = user.displayName ? user.displayName[0].toUpperCase() : '?';
+    document.getElementById('userNameTop').textContent = user.displayName ? user.displayName.split(' ')[0] : user.email;
+    initListeners();
+    updateCountdown();
+    setInterval(updateCountdown, 60000);
+  } else {
+    currentUser = null;
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('app').classList.remove('visible');
+  }
+});
+
+// ── COUNTDOWN & SEMANA ───────────────────────────────
+function updateCountdown() {
+  const now = new Date();
+  const diff = FECHA_PARTO - now;
+  const dias = Math.max(0, Math.ceil(diff / (1000*60*60*24)));
+
+  // Calcular semana (asumiendo EEG ~11 semanas antes del parto → ajusta si tienes la fecha de concepción)
+  // Fecha probable de última menstruación = parto - 280 días
+  const FUM = new Date(FECHA_PARTO.getTime() - 280*24*60*60*1000);
+  const semanas = Math.min(40, Math.max(1, Math.floor((now - FUM) / (7*24*60*60*1000))));
+  const pct = Math.round(semanas/40*100);
+  const info = getSemanaInfo(semanas);
+  const trimestre = semanas <= 13 ? 'Primer trimestre' : semanas <= 26 ? 'Segundo trimestre' : 'Tercer trimestre';
+
+  // Sidebar
+  document.getElementById('sidebarDays').textContent = dias;
+  document.getElementById('sidebarWeek').textContent = semanas;
+  document.getElementById('sidebarTrimestre').textContent = trimestre;
+  document.getElementById('sidebarProgFill').style.width = pct + '%';
+
+  // Hero
+  document.getElementById('heroDays').textContent = dias;
+
+  // Dash semana
+  document.getElementById('dashWeekNum').textContent = semanas;
+  document.getElementById('dashWeekTitle').textContent = info.titulo;
+  document.getElementById('dashWeekDesc').textContent = info.desc;
+  document.getElementById('dashWeekPct').textContent = pct + '%';
+  document.getElementById('dashWeekBar').style.width = pct + '%';
+}
+
+// ── NAVEGACIÓN ───────────────────────────────────────
+function navTo(sec) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('sec-' + sec).classList.add('active');
+  const navItems = document.querySelectorAll('.nav-item');
+  const map = ['inicio','tareas','hitos','galeria','notas','lista'];
+  const idx = map.indexOf(sec);
+  if (idx >= 0) navItems[idx].classList.add('active');
+}
+
+// ── FIREBASE LISTENERS ───────────────────────────────
+function initListeners() {
+  // Tareas
+  db.ref('tareas').on('value', snap => {
+    dataTareas = snap.val() || {};
+    renderTareas();
+    renderDashTareas();
+    updateStats();
+  });
+  // Hitos
+  db.ref('hitos').on('value', snap => {
+    dataHitos = snap.val() || {};
+    renderHitos();
+    updateStats();
+    // si no hay hitos, sembrar defaults
+    if (!snap.val()) sembrarHitos();
+  });
+  // Notas
+  db.ref('notas').on('value', snap => {
+    dataNotas = snap.val() || {};
+    renderNotas();
+    renderDashNota();
+    updateStats();
+  });
+  // Galería (metadata en DB)
+  db.ref('galeria').on('value', snap => {
+    dataGaleria = snap.val() || {};
+    renderGaleria();
+    updateStats();
+  });
+  // Lista
+  db.ref('lista').on('value', snap => {
+    dataLista = snap.val() || {};
+    renderLista();
+    // sembrar categorías si vacío
+    if (!snap.val()) sembrarLista();
+  });
+}
+
+// ── STATS ────────────────────────────────────────────
+function updateStats() {
+  const tareasArr = Object.values(dataTareas);
+  const done = tareasArr.filter(t=>t.done).length;
+  const pend = tareasArr.filter(t=>!t.done).length;
+  document.getElementById('statTareasDone').textContent = done;
+  document.getElementById('statTareasPend').textContent = pend;
+  document.getElementById('statFotos').textContent = Object.keys(dataGaleria).length;
+  document.getElementById('statHitosDone').textContent = Object.values(dataHitos).filter(h=>h.status==='done').length;
+  document.getElementById('statNotas').textContent = Object.keys(dataNotas).length;
+
+  // badge tareas pendientes
+  const badge = document.getElementById('badgeTareas');
+  if (pend > 0) { badge.textContent = pend; badge.style.display = ''; }
+  else badge.style.display = 'none';
+}
+
+// ══════════════════════════════════════
+// TAREAS
+// ══════════════════════════════════════
+function renderTareas() {
+  const list = document.getElementById('tareasList');
+  let items = Object.entries(dataTareas).map(([id,t])=>({...t,id}));
+
+  // Filtros
+  if (tareasFiltro === 'pendiente') items = items.filter(t=>!t.done);
+  else if (tareasFiltro === 'done')  items = items.filter(t=>t.done);
+  else if (tareasFiltro === 'fab')   items = items.filter(t=>t.resp==='fab'||t.resp==='amb');
+  else if (tareasFiltro === 'fio')   items = items.filter(t=>t.resp==='fio'||t.resp==='amb');
+
+  if (items.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">✅</div><h4>Sin tareas aquí</h4><p>Agrega una nueva tarea para organizar todo lo que hay que hacer.</p></div>';
+    return;
+  }
+
+  // Agrupar por categoría
+  const cats = {};
+  items.forEach(t => {
+    const cat = t.cat || 'Otro';
+    if (!cats[cat]) cats[cat] = [];
+    cats[cat].push(t);
+  });
+
+  list.innerHTML = Object.entries(cats).map(([cat, ts]) => `
+    <div class="task-group">
+      <div class="task-group-title">${cat}</div>
+      ${ts.map(t => renderTareaCard(t)).join('')}
+    </div>
+  `).join('');
+}
+
+function renderTareaCard(t) {
+  const respLabel = {fab:'Fabián',fio:'Fiorella',amb:'Ambos'}[t.resp] || '—';
+  const respChip  = {fab:'chip-p',fio:'chip-f',amb:'chip-amb'}[t.resp] || 'chip-amb';
+  const today = new Date().toISOString().split('T')[0];
+  const vencida = t.fecha && t.fecha < today && !t.done;
+  return `
+    <div class="task-card prio-${t.prio||'media'} ${t.done?'done':''}">
+      <div class="task-cb ${t.done?'done':''}" onclick="toggleTarea('${t.id}')"></div>
+      <div class="task-body">
+        <div class="task-name ${t.done?'done':''}">${esc(t.name)}</div>
+        ${t.desc ? `<div class="task-desc">${esc(t.desc)}</div>` : ''}
+        <div class="task-footer">
+          <span class="chip ${respChip}">${respLabel}</span>
+          ${t.fecha ? `<span class="task-due ${vencida?'vencida':''}">📅 ${formatFecha(t.fecha)}${vencida?' · Vencida':''}</span>` : ''}
+          <span class="chip chip-pend" style="font-size:9px;">${t.prio==='alta'?'🔴 Alta':t.prio==='baja'?'🟢 Baja':'🟡 Media'}</span>
+        </div>
+      </div>
+      <div class="task-actions">
+        <button class="btn btn-ghost btn-sm" onclick="abrirModalTarea('${t.id}')">✏️</button>
+        <button class="btn btn-ghost btn-sm" onclick="eliminarTarea('${t.id}')" style="color:#c04040;">✕</button>
+      </div>
+    </div>
+  `;
+}
+
+function toggleTarea(id) {
+  const t = dataTareas[id];
+  if (!t) return;
+  db.ref('tareas/' + id + '/done').set(!t.done);
+  db.ref('tareas/' + id + '/doneAt').set(!t.done ? new Date().toISOString() : null);
+}
+
+function eliminarTarea(id) {
+  if (confirm('¿Eliminar esta tarea?')) db.ref('tareas/' + id).remove();
+}
+
+function filterTareas(filtro) {
+  tareasFiltro = filtro;
+  document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+  event.target.classList.add('active');
+  renderTareas();
+}
+
+// Dashboard tareas
+function renderDashTareas() {
+  const el = document.getElementById('dashTareas');
+  const items = Object.entries(dataTareas)
+    .map(([id,t])=>({...t,id}))
+    .filter(t=>!t.done)
+    .sort((a,b)=> (a.fecha||'z') > (b.fecha||'z') ? 1 : -1)
+    .slice(0,4);
+  if (items.length === 0) {
+    el.innerHTML = '<div style="font-size:12px;color:var(--dim);padding:8px 0;">¡Todo al día! 🎉</div>';
+    return;
+  }
+  el.innerHTML = items.map(t => {
+    const respChip = {fab:'chip-p',fio:'chip-f',amb:'chip-amb'}[t.resp]||'chip-amb';
+    return `<div class="task-mini">
+      <div class="t-cb ${t.done?'done':''}" onclick="toggleTarea('${t.id}')"></div>
+      <div class="t-label ${t.done?'done':''}">${esc(t.name)}</div>
+      <div class="t-meta">
+        <span class="chip ${respChip}" style="font-size:9px;">${{fab:'Fab',fio:'Fio',amb:'Amb'}[t.resp]||'—'}</span>
+        ${t.fecha?`<span style="font-size:10px;color:var(--dim);">${formatFecha(t.fecha)}</span>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// Modal tarea
+function abrirModalTarea(id) {
+  tareaEditing = id || null;
+  document.getElementById('modalTareaTitulo').textContent = id ? 'Editar tarea' : 'Nueva tarea';
+  if (id && dataTareas[id]) {
+    const t = dataTareas[id];
+    document.getElementById('tareaName').value = t.name || '';
+    document.getElementById('tareaDesc').value = t.desc || '';
+    document.getElementById('tareaResp').value = t.resp || 'amb';
+    document.getElementById('tareaPrio').value = t.prio || 'media';
+    document.getElementById('tareaFecha').value = t.fecha || '';
+    document.getElementById('tareaCat').value  = t.cat  || 'Otro';
+  } else {
+    document.getElementById('tareaName').value = '';
+    document.getElementById('tareaDesc').value = '';
+    document.getElementById('tareaResp').value = 'amb';
+    document.getElementById('tareaPrio').value = 'media';
+    document.getElementById('tareaFecha').value = '';
+    document.getElementById('tareaCat').value  = 'Otro';
+  }
+  document.getElementById('modalTarea').style.display = 'flex';
+  setTimeout(()=>document.getElementById('tareaName').focus(),100);
+}
+
+function cerrarModalTarea() { document.getElementById('modalTarea').style.display = 'none'; }
+
+function guardarTarea() {
+  const name = document.getElementById('tareaName').value.trim();
+  if (!name) { showToast('Escribe el nombre de la tarea'); return; }
+  const data = {
+    name,
+    desc:  document.getElementById('tareaDesc').value.trim(),
+    resp:  document.getElementById('tareaResp').value,
+    prio:  document.getElementById('tareaPrio').value,
+    fecha: document.getElementById('tareaFecha').value,
+    cat:   document.getElementById('tareaCat').value,
+    done:  tareaEditing ? (dataTareas[tareaEditing]?.done || false) : false,
+    creadoPor: currentUser?.displayName || '',
+    creadoEn:  tareaEditing ? (dataTareas[tareaEditing]?.creadoEn || new Date().toISOString()) : new Date().toISOString(),
+  };
+  const ref = tareaEditing ? db.ref('tareas/' + tareaEditing) : db.ref('tareas').push();
+  ref.set(data).then(()=>{ cerrarModalTarea(); showToast(tareaEditing ? 'Tarea actualizada ✓' : 'Tarea guardada ✓'); });
+}
+
+// ══════════════════════════════════════
+// HITOS
+// ══════════════════════════════════════
+function sembrarHitos() {
+  const defaults = [
+    { name:'Primera consulta prenatal', desc:'El inicio de todo. Confirmación del embarazo.', fecha:'', status:'done', semana:6 },
+    { name:'Primera ecografía', desc:'La primera vez que vemos a Amelia.', fecha:'', status:'done', semana:12 },
+    { name:'Sexo confirmado — ¡Es niña!', desc:'El momento en que supimos que sería Amelia.', fecha:'', status:'done', semana:20 },
+    { name:'Baby shower', desc:'La celebración con familia y amigos.', fecha:'', status:'next', semana:30 },
+    { name:'Valija para la clínica lista', desc:'Todo preparado para el gran día.', fecha:'', status:'pending', semana:36 },
+    { name:'Visita a la clínica / puericultura', desc:'Conocer el lugar donde llegará Amelia.', fecha:'', status:'pending', semana:28 },
+    { name:'¡Amelia llega al mundo!', desc:'El día más esperado.', fecha:'2025-11-02', status:'pending', semana:40 },
+  ];
+  const updates = {};
+  defaults.forEach(h => { const key = db.ref('hitos').push().key; updates[key] = h; });
+  db.ref('hitos').update(updates);
+}
+
+function renderHitos() {
+  const list = document.getElementById('hitosList');
+  const items = Object.entries(dataHitos)
+    .map(([id,h])=>({...h,id}))
+    .sort((a,b)=> (a.semana||99) - (b.semana||99));
+
+  if (items.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">🌟</div><h4>Sin hitos aún</h4><p>Agrega los momentos importantes del embarazo.</p></div>';
+    return;
+  }
+
+  list.innerHTML = items.map(h => `
+    <div class="hito-item">
+      <div class="hito-dot ${h.status||'pending'}"></div>
+      <div class="hito-top">
+        <div>
+          <div class="hito-name">${esc(h.name)}</div>
+          ${h.semana?`<div class="hito-fecha">Semana ${h.semana}${h.fecha?' · '+formatFecha(h.fecha):''}</div>`:''}
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;flex-shrink:0;">
+          <span class="${h.status==='done'?'hito-status-done':h.status==='next'?'hito-status-next':''}">
+            ${h.status==='done'?'✓ Completado':h.status==='next'?'→ Próximo':'· Pendiente'}
+          </span>
+          <button class="btn btn-ghost btn-sm" onclick="eliminarHito('${h.id}')">✕</button>
+        </div>
+      </div>
+      ${h.desc?`<div class="hito-desc">${esc(h.desc)}</div>`:''}
+    </div>
+  `).join('');
+}
+
+function abrirModalHito() {
+  document.getElementById('hitoName').value = '';
+  document.getElementById('hitoDesc').value = '';
+  document.getElementById('hitoFecha').value = '';
+  document.getElementById('hitoStatus').value = 'pending';
+  document.getElementById('hitoSemana').value = '';
+  document.getElementById('modalHito').style.display = 'flex';
+}
+
+function cerrarModalHito() { document.getElementById('modalHito').style.display = 'none'; }
+
+function guardarHito() {
+  const name = document.getElementById('hitoName').value.trim();
+  if (!name) { showToast('Escribe el nombre del hito'); return; }
+  const data = {
+    name,
+    desc:   document.getElementById('hitoDesc').value.trim(),
+    fecha:  document.getElementById('hitoFecha').value,
+    status: document.getElementById('hitoStatus').value,
+    semana: parseInt(document.getElementById('hitoSemana').value) || null,
+  };
+  db.ref('hitos').push(data).then(()=>{ cerrarModalHito(); showToast('Hito guardado ✓'); });
+}
+
+function eliminarHito(id) {
+  if (confirm('¿Eliminar este hito?')) db.ref('hitos/' + id).remove();
+}
+
+// ══════════════════════════════════════
+// GALERÍA
+// ══════════════════════════════════════
+const dz = document.getElementById('dropZone');
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('drag'));
+dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('drag'); subirFotos(e.dataTransfer.files); });
+
+async function subirFotos(files) {
+  if (!files || files.length === 0) return;
+  showToast('Subiendo ' + files.length + ' foto(s)…');
+  for (const file of Array.from(files)) {
+    if (!file.type.startsWith('image/')) continue;
+    const key = db.ref('galeria').push().key;
+    const ref = storage.ref('galeria/' + key + '_' + file.name);
+    try {
+      const snap = await ref.put(file);
+      const url = await snap.ref.getDownloadURL();
+      await db.ref('galeria/' + key).set({
+        url, name: file.name,
+        fecha: new Date().toISOString(),
+        autor: currentUser?.displayName || '',
+      });
+    } catch(e) { showToast('Error al subir: ' + e.message); }
+  }
+  showToast('Fotos guardadas ✓');
+}
+
+function renderGaleria() {
+  const grid = document.getElementById('galleryGrid');
+  const items = Object.entries(dataGaleria).sort((a,b)=> b[1].fecha > a[1].fecha ? 1 : -1);
+  if (items.length === 0) {
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><div class="empty-icon">📷</div><h4>Sin fotos aún</h4><p>Sube las primeras fotos del embarazo.</p></div>';
+    return;
+  }
+  grid.innerHTML = items.map(([id,f]) => `
+    <div class="foto-card" onclick="abrirLightbox('${esc(f.url)}')">
+      <img src="${esc(f.url)}" alt="${esc(f.name)}" loading="lazy">
+      <button class="foto-card-del" onclick="event.stopPropagation();eliminarFoto('${id}','${esc(f.url)}')">×</button>
+      <div class="foto-card-info">
+        <div class="foto-card-title">${esc(f.name)}</div>
+        <div class="foto-card-date">${formatFechaCorta(f.fecha)} · ${esc(f.autor||'')}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function abrirLightbox(url) {
+  document.getElementById('lightboxImg').src = url;
+  document.getElementById('lightbox').classList.add('show');
+}
+function cerrarLightbox() { document.getElementById('lightbox').classList.remove('show'); }
+
+async function eliminarFoto(id, url) {
+  if (!confirm('¿Eliminar esta foto?')) return;
+  await db.ref('galeria/' + id).remove();
+  try { await storage.refFromURL(url).delete(); } catch(e) {}
+  showToast('Foto eliminada');
+}
+
+// ══════════════════════════════════════
+// NOTAS
+// ══════════════════════════════════════
+function selectMood(btn, mood) {
+  moodSelected = mood;
+  document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function guardarNota() {
+  const text = document.getElementById('notaText').value.trim();
+  if (!text) { showToast('Escribe algo antes de guardar'); return; }
+  const isFab = currentUser?.email === 'fabianpulgaru@gmail.com';
+  db.ref('notas').push({
+    text,
+    mood: moodSelected,
+    autor: currentUser?.displayName || '',
+    autorRole: isFab ? 'fab' : 'fio',
+    fecha: new Date().toISOString(),
+  }).then(() => {
+    document.getElementById('notaText').value = '';
+    moodSelected = '';
+    document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
+    showToast('Nota guardada ✓');
+  });
+}
+
+function renderNotas() {
+  const list = document.getElementById('notasList');
+  const items = Object.entries(dataNotas)
+    .map(([id,n])=>({...n,id}))
+    .sort((a,b)=> b.fecha > a.fecha ? 1 : -1);
+
+  if (items.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">📓</div><h4>Sin notas aún</h4><p>Escribe la primera nota del diario de Amelia ♡</p></div>';
+    return;
+  }
+  list.innerHTML = items.map(n => {
+    const isFab = n.autorRole === 'fab';
+    return `<div class="nota-card">
+      <div class="nota-header">
+        <div class="nota-author-chip">
+          <div class="nota-author-avatar ${isFab?'av-p':'av-f'}">${(n.autor||'?')[0].toUpperCase()}</div>
+          <span class="nota-author-name" style="color:${isFab?'var(--sage-d)':'var(--rose-d)'};">${esc(n.autor||'Anónimo')}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="nota-date">${formatFechaCompleta(n.fecha)}</span>
+          <button class="btn btn-ghost btn-sm" onclick="eliminarNota('${n.id}')" style="color:#c04040;font-size:11px;">✕</button>
+        </div>
+      </div>
+      <div class="nota-card-text">${esc(n.text)}</div>
+      ${n.mood?`<div class="nota-card-mood">${n.mood}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function renderDashNota() {
+  const el = document.getElementById('dashNota');
+  const items = Object.values(dataNotas).sort((a,b)=> b.fecha > a.fecha ? 1 : -1);
+  if (items.length === 0) {
+    el.innerHTML = '<div style="font-size:12px;color:var(--dim);">Escribe la primera nota ♡</div>';
+    return;
+  }
+  const n = items[0];
+  const isFab = n.autorRole === 'fab';
+  el.innerHTML = `<div class="nota-mini">
+    <div class="nota-mini-author">${n.mood||'♡'} ${esc(n.autor||'')} · ${formatFechaCompleta(n.fecha)}</div>
+    <div class="nota-mini-text">${esc(n.text.length>150?n.text.slice(0,150)+'…':n.text)}</div>
+  </div>`;
+}
+
+function eliminarNota(id) {
+  if (confirm('¿Eliminar esta nota?')) db.ref('notas/' + id).remove();
+}
+
+// ══════════════════════════════════════
+// LISTA DE COMPRAS
+// ══════════════════════════════════════
+const LISTA_CATS_DEFAULT = {
+  ropa:       { icon:'👗', titulo:'Ropa y accesorios', items:['Bodies (0-3m)','Pijamas','Gorros de recién nacido','Mantas','Calcetines'] },
+  cuna:       { icon:'🛏', titulo:'Dormir', items:['Cuna o moisés','Colchón','Sabanas ajustables','Saco de dormir'] },
+  alimentacion:{ icon:'🍼', titulo:'Alimentación', items:['Biberones','Esterilizador','Sacaleches','Cojín de lactancia'] },
+  bano:       { icon:'🛁', titulo:'Baño e higiene', items:['Bañera','Toallas suaves','Champú bebé','Pañales (recién nacido)','Toallitas húmedas'] },
+  transporte: { icon:'🚗', titulo:'Transporte', items:['Silla para el auto','Coche o carriola','Porta bebé / fular'] },
+  salud:      { icon:'💊', titulo:'Salud', items:['Termómetro','Aspirador nasal','Cortaúñas bebé','Botiquín básico'] },
+};
+
+function sembrarLista() {
+  const updates = {};
+  Object.entries(LISTA_CATS_DEFAULT).forEach(([catId, cat]) => {
+    cat.items.forEach(nombre => {
+      const key = db.ref('lista').push().key;
+      updates[key] = { nombre, cat: catId, done: false, creadoEn: new Date().toISOString() };
+    });
+  });
+  db.ref('lista').update(updates);
+}
+
+function renderLista() {
+  const grid = document.getElementById('listaGrid');
+  const cats = {};
+  Object.entries(dataLista).forEach(([id, item]) => {
+    const cat = item.cat || 'otro';
+    if (!cats[cat]) cats[cat] = [];
+    cats[cat].push({...item, id});
+  });
+
+  grid.innerHTML = Object.entries(LISTA_CATS_DEFAULT).map(([catId, catDef]) => {
+    const items = (cats[catId] || []).sort((a,b)=> (a.done?1:-1) - (b.done?1:-1));
+    const doneCount = items.filter(i=>i.done).length;
+    return `<div class="lista-cat">
+      <div class="lista-cat-header">
+        <span>${catDef.icon}</span>
+        <span class="lista-cat-title">${catDef.titulo}</span>
+        <span class="lista-cat-count">${doneCount}/${items.length}</span>
+      </div>
+      <div class="lista-items">
+        ${items.map(item => `
+          <div class="lista-item">
+            <div class="l-cb ${item.done?'done':''}" onclick="toggleListaItem('${item.id}')"></div>
+            <span class="l-text ${item.done?'done':''}">${esc(item.nombre)}</span>
+            <button class="l-del" onclick="eliminarListaItem('${item.id}')">×</button>
+          </div>
+        `).join('')}
+      </div>
+      <div class="lista-add-row">
+        <input class="lista-add-input" type="text" placeholder="+ Agregar ítem…"
+          onkeydown="if(event.key==='Enter')agregarListaItem(this,'${catId}')">
+        <button class="btn btn-outline btn-sm" onclick="agregarListaItem(this.previousElementSibling,'${catId}')">+</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleListaItem(id) {
+  const item = dataLista[id];
+  if (!item) return;
+  db.ref('lista/' + id + '/done').set(!item.done);
+}
+
+function eliminarListaItem(id) {
+  db.ref('lista/' + id).remove();
+}
+
+function agregarListaItem(input, catId) {
+  const nombre = input.value.trim();
+  if (!nombre) return;
+  db.ref('lista').push({ nombre, cat: catId, done: false, creadoEn: new Date().toISOString() })
+    .then(() => { input.value = ''; });
+}
+
+// ── HELPERS ──────────────────────────────────────────
+function esc(str) {
+  return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function formatFecha(str) {
+  if (!str) return '';
+  const [y,m,d] = str.split('-');
+  const meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  return d + ' ' + meses[parseInt(m)-1];
+}
+
+function formatFechaCorta(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  return d.toLocaleDateString('es-CL', {day:'numeric',month:'short'});
+}
+
+function formatFechaCompleta(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  return d.toLocaleDateString('es-CL', {day:'numeric',month:'long',year:'numeric'});
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2800);
+}
+</script>
+</body>
+</html>
