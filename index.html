@@ -649,7 +649,7 @@ h1,h2,h3,h4{font-family:'Fraunces',serif;font-weight:300;}
 // ── CONFIG ────────────────────────────────────────────
 const fbConfig = {
   apiKey: "AIzaSyDBlLHG_SDpGBboHlm3JjVd09Qx-qzAZkI",
-  authDomain: "fabianpulgaru-dev.github.io",
+  authDomain: "ee12026-f5e3d.firebaseapp.com",
   databaseURL: "https://ee12026-f5e3d-default-rtdb.firebaseio.com",
   projectId: "ee12026-f5e3d",
   storageBucket: "ee12026-f5e3d.firebasestorage.app",
@@ -704,27 +704,25 @@ let dataEventos = {};
 // ── AUTH ──────────────────────────────────────────────
 document.getElementById('btnGoogle').addEventListener('click', () => {
   const provider = new firebase.auth.GoogleAuthProvider();
-  // Safari en iOS no soporta signInWithPopup — usa redirect
-  const isSafariIOS = /iP(hone|ad|od)/.test(navigator.userAgent) ||
-    (/Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent));
-  if(isSafariIOS){
-    auth.signInWithRedirect(provider).catch(e => {
-      const el = document.getElementById('gsiError');
-      el.textContent = 'Error: ' + e.message;
-      el.style.display = 'block';
-    });
+  provider.setCustomParameters({ prompt: 'select_account' });
+  // En iOS Safari signInWithPopup falla — usar redirect siempre en móvil
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if(isMobile){
+    auth.signInWithRedirect(provider);
   } else {
     auth.signInWithPopup(provider).catch(e => {
       const el = document.getElementById('gsiError');
-      el.textContent = 'Error al iniciar sesión: ' + e.message;
+      el.textContent = 'Error: ' + e.message;
       el.style.display = 'block';
     });
   }
 });
 
-// Capturar el resultado cuando Safari vuelve del redirect
-auth.getRedirectResult().catch(e => {
-  if(e.code !== 'auth/no-auth-event'){
+// Capturar resultado del redirect (iOS)
+auth.getRedirectResult().then(result => {
+  // resultado manejado por onAuthStateChanged
+}).catch(e => {
+  if(e.code && e.code !== 'auth/no-auth-event'){
     const el = document.getElementById('gsiError');
     if(el){ el.textContent = 'Error: ' + e.message; el.style.display = 'block'; }
   }
