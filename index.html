@@ -568,21 +568,21 @@ h1,h2,h3,h4{font-family:'Fraunces',serif;font-weight:300;}
               <div style="margin-bottom:8px;">
                 <div style="font-size:11px;color:var(--dim);margin-bottom:6px;letter-spacing:1px;text-transform:uppercase;font-weight:500;">Tipo de acceso</div>
                 <div style="display:flex;gap:6px;flex-wrap:wrap;" id="rolPicker">
-                  <label class="rol-opt" data-rol="editor"><input type="radio" name="invRol" value="editor" checked style="display:none"> <span>✏️ Editor</span><small>Ve y edita todo</small></label>
-                  <label class="rol-opt" data-rol="familia"><input type="radio" name="invRol" value="familia" style="display:none"> <span>👨‍👩‍👧 Familia</span><small>Solo lectura</small></label>
-                  <label class="rol-opt" data-rol="personalizado"><input type="radio" name="invRol" value="personalizado" style="display:none"> <span>⚙️ Personalizado</span><small>Tú eliges</small></label>
+                  <div class="rol-opt selected" data-rol="editor" onclick="selRol(this)"><span>✏️ Editor</span><small>Ve y edita todo</small></div>
+                  <div class="rol-opt" data-rol="familia" onclick="selRol(this)"><span>👨‍👩‍👧 Familia</span><small>Solo lectura · Inicio, Hitos, Fotos</small></div>
+                  <div class="rol-opt" data-rol="personalizado" onclick="selRol(this)"><span>⚙️ Personalizado</span><small>Tú eliges qué ve</small></div>
                 </div>
               </div>
               <div id="seccionesPicker" style="display:none;margin-bottom:10px;">
                 <div style="font-size:11px;color:var(--dim);margin-bottom:6px;font-weight:500;">Secciones visibles:</div>
                 <div style="display:flex;gap:6px;flex-wrap:wrap;" id="seccionesCheck">
-                  <label class="sec-chk"><input type="checkbox" value="inicio" checked> 🏠 Inicio</label>
-                  <label class="sec-chk"><input type="checkbox" value="eventos"> 🎀 Eventos</label>
-                  <label class="sec-chk"><input type="checkbox" value="tareas"> ✅ Tareas</label>
-                  <label class="sec-chk"><input type="checkbox" value="hitos" checked> 🌟 Hitos</label>
-                  <label class="sec-chk"><input type="checkbox" value="galeria" checked> 📷 Galería</label>
-                  <label class="sec-chk"><input type="checkbox" value="notas"> 📓 Notas</label>
-                  <label class="sec-chk"><input type="checkbox" value="lista"> 🛍 Lista</label>
+                  <div class="sec-chk on" data-sec="inicio" onclick="toggleSec(this)">🏠 Inicio</div>
+                  <div class="sec-chk" data-sec="eventos" onclick="toggleSec(this)">🎀 Eventos</div>
+                  <div class="sec-chk" data-sec="tareas" onclick="toggleSec(this)">✅ Tareas</div>
+                  <div class="sec-chk on" data-sec="hitos" onclick="toggleSec(this)">🌟 Hitos</div>
+                  <div class="sec-chk on" data-sec="galeria" onclick="toggleSec(this)">📷 Galería</div>
+                  <div class="sec-chk" data-sec="notas" onclick="toggleSec(this)">📓 Notas</div>
+                  <div class="sec-chk" data-sec="lista" onclick="toggleSec(this)">🛍 Lista</div>
                 </div>
               </div>
               <button class="btn btn-rose btn-sm" onclick="agregarInvitado()">+ Agregar usuario</button>
@@ -946,6 +946,13 @@ function aplicarPermisos(){
 }
 
 // ══════ ACCESO ════════════════════════════════════════════════
+window.selRol = function(el){
+  document.querySelectorAll('.rol-opt').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('seccionesPicker').style.display = el.dataset.rol==='personalizado'?'block':'none';
+};
+window.toggleSec = function(el){ el.classList.toggle('on'); };
+
 function renderUsuariosList(){
   const list = document.getElementById('usuariosList');
   if(!list) return;
@@ -965,23 +972,6 @@ function renderUsuariosList(){
       ${!u.base&&esAdmin()?`<button class="btn btn-ghost btn-sm" onclick="quitarInvitado('${u.key}')" style="color:#c04040;">Quitar</button>`:''}
     </div>
   `).join('');
-
-  // Setup rol picker interactivity
-  document.querySelectorAll('.rol-opt').forEach(opt=>{
-    opt.addEventListener('click',()=>{
-      document.querySelectorAll('.rol-opt').forEach(o=>o.classList.remove('selected'));
-      opt.classList.add('selected');
-      const rol = opt.dataset.rol;
-      document.getElementById('seccionesPicker').style.display = rol==='personalizado'?'block':'none';
-    });
-  });
-  // sec-chk toggle
-  document.querySelectorAll('.sec-chk').forEach(chk=>{
-    chk.addEventListener('click',()=>chk.classList.toggle('on'));
-  });
-  // Primer rol seleccionado por defecto
-  const first = document.querySelector('.rol-opt');
-  if(first) first.classList.add('selected');
 }
 
 window.agregarInvitado = async function(){
@@ -992,10 +982,10 @@ window.agregarInvitado = async function(){
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ toast('Correo inválido'); return; }
   if(USUARIOS_BASE[email]){ toast('Ese correo ya tiene acceso'); return; }
   if(Object.values(dUsuarios).find(u=>u.email===email)){ toast('Ese correo ya fue invitado'); return; }
-  const rolSel = document.querySelector('.rol-opt.selected')?.dataset?.rol || 'familia';
+  const rolSel = document.querySelector('#rolPicker .rol-opt.selected')?.dataset?.rol || 'familia';
   let secciones = null;
   if(rolSel==='personalizado'){
-    secciones = [...document.querySelectorAll('.sec-chk.on')].map(c=>c.querySelector('input').value);
+    secciones = [...document.querySelectorAll('#seccionesCheck .sec-chk.on')].map(c=>c.dataset.sec);
     if(!secciones.length){ toast('Selecciona al menos una sección'); return; }
   }
   const data = {email,nombre,rol:rolSel,agregadoPor:CU.email,fecha:new Date().toISOString()};
@@ -1003,6 +993,9 @@ window.agregarInvitado = async function(){
   await push(ref(db,'acceso'),data);
   document.getElementById('invEmail').value='';
   document.getElementById('invNombre').value='';
+  // Reset rol picker
+  document.querySelectorAll('#rolPicker .rol-opt').forEach((o,i)=>o.classList.toggle('selected',i===0));
+  document.getElementById('seccionesPicker').style.display='none';
   toast('✓ '+nombre+' puede entrar ahora');
 };
 
@@ -1198,19 +1191,32 @@ function renderEvLista(evId,ev){
 }
 
 function renderEvFotos(evId){
-  const fotos=Object.entries(dGaleria).filter(([,f])=>f.evId===evId).sort((a,b)=>b[1].fecha>a[1].fecha?1:-1);
-  return `<div class="dropzone" id="dz_${evId}" onclick="document.getElementById('fi_${evId}').click()">
-    <p>📷 <strong>Arrastra fotos aquí</strong> o haz clic<br>Fotos de este evento</p>
-  </div>
-  <input type="file" id="fi_${evId}" multiple accept="image/*" style="display:none" onchange="subirFotos(this.files,'${evId}')">
-  <div class="gallgrid">
-    ${fotos.length===0?'<div class="empty" style="grid-column:1/-1"><div class="empty-icon">📷</div><h4>Sin fotos</h4><p>Sube fotos de inspiración.</p></div>':
-    fotos.map(([id,f])=>`<div class="fcard" onclick="abrirLightbox('${esc(f.url)}')">
-      <img src="${esc(f.url)}" alt="${esc(f.name)}" loading="lazy">
-      <button class="fcard-del" onclick="event.stopPropagation();eliminarFoto('${id}','${esc(f.url)}')">×</button>
-      <div class="fcard-info"><div class="fcard-name">${esc(f.name)}</div><div class="fcard-date">${fCorta(f.fecha)}</div></div>
-    </div>`).join('')}
-  </div>`;
+  const albEvs = Object.entries(dAlbumes).filter(([,a])=>a.evId===evId).sort((a,b)=>b[1].creadoEn>a[1].creadoEn?1:-1);
+  const puedeEditar = getRol()!=='familia';
+  return `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+      <div style="font-size:12px;color:var(--dim)">${albEvs.length} álbum${albEvs.length!==1?'es':''} en este evento</div>
+      ${puedeEditar?`<button class="btn btn-rose btn-sm" onclick="abrirModalAlbum(null,'${evId}')">+ Nuevo álbum</button>`:''}
+    </div>
+    ${albEvs.length===0?`
+      <div class="empty"><div class="empty-icon">📷</div><h4>Sin álbumes</h4><p>Crea un álbum para organizar las fotos de este evento.</p></div>
+    `:`
+      <div class="album-grid">
+        ${albEvs.map(([id,alb])=>{
+          const fotos = Object.values(dGaleria).filter(f=>f.albumId===id);
+          const cover = fotos.find(f=>f.url);
+          return `<div class="album-card" onclick="abrirAlbum('${id}')">
+            ${cover?`<img class="album-cover" src="${esc(cover.url)}" alt="">`:`<div class="album-cover-empty">📷</div>`}
+            <div class="album-overlay">
+              <div class="album-title">${esc(alb.nombre||'Sin título')}</div>
+              <div class="album-meta">${fotos.length} foto${fotos.length!==1?'s':''} ${alb.fecha?'· '+esc(alb.fecha):''}</div>
+            </div>
+            ${puedeEditar?`<button class="album-del" onclick="event.stopPropagation();eliminarAlbum('${id}')">×</button>`:''}
+          </div>`;
+        }).join('')}
+      </div>
+    `}
+  `;
 }
 
 function renderEvNotas(evId){
@@ -1545,7 +1551,7 @@ function renderAlbumsGrid(){
   const det = document.getElementById('albumDetalle');
   if(!vista) return;
   vista.style.display=''; det.style.display='none'; albumActual=null;
-  const items = Object.entries(dAlbumes).sort((a,b)=>b[1].creadoEn>a[1].creadoEn?1:-1);
+  const items = Object.entries(dAlbumes).filter(([,a])=>!a.evId).sort((a,b)=>b[1].creadoEn>a[1].creadoEn?1:-1);
 
   const puedeEditar = puedeVer('galeria') && getRol() !== 'familia';
 
@@ -1628,8 +1634,9 @@ function mostrarAlbumsGrid(){
   renderAlbumsGrid();
 }
 
-window.abrirModalAlbum = function(id){
+window.abrirModalAlbum = function(id, evId){
   albEditing = id||null;
+  albEvId = evId||null;
   document.getElementById('mAlbumTitle').textContent = id?'Editar álbum':'Nuevo álbum';
   if(id&&dAlbumes[id]){
     const alb=dAlbumes[id];
@@ -1637,6 +1644,7 @@ window.abrirModalAlbum = function(id){
     document.getElementById('albDesc').value=alb.desc||'';
     document.getElementById('albFecha').value=alb.fecha||'';
     albEstiloSel=alb.estilo||'cuadricula';
+    albEvId=alb.evId||null;
   } else {
     document.getElementById('albNombre').value='';
     document.getElementById('albDesc').value='';
@@ -1644,21 +1652,33 @@ window.abrirModalAlbum = function(id){
     albEstiloSel='cuadricula';
   }
   document.getElementById('albEstilo').value=albEstiloSel;
-  document.querySelectorAll('.estilo-opt').forEach(o=>o.classList.toggle('sel',o.onclick.toString().includes(albEstiloSel)));
+  document.querySelectorAll('.estilo-opt').forEach(o=>{
+    o.classList.toggle('sel', o.getAttribute('onclick')?.includes("'"+albEstiloSel+"'"));
+  });
   document.getElementById('mAlbum').classList.add('on');
 };
 window.cerrarModalAlbum=()=>document.getElementById('mAlbum').classList.remove('on');
 window.selEstilo=function(el,estilo){ albEstiloSel=estilo; document.getElementById('albEstilo').value=estilo; document.querySelectorAll('.estilo-opt').forEach(o=>o.classList.remove('sel')); el.classList.add('sel'); };
 
 let albEditing = null;
+let albEvId = null;
 window.guardarAlbum=async function(){
   const nombre=document.getElementById('albNombre').value.trim();
   if(!nombre){ toast('Escribe el nombre del álbum'); return; }
-  const data={nombre,desc:document.getElementById('albDesc').value.trim(),fecha:document.getElementById('albFecha').value.trim(),estilo:albEstiloSel,creadoEn:albEditing?(dAlbumes[albEditing]?.creadoEn||new Date().toISOString()):new Date().toISOString()};
+  const data={
+    nombre,
+    desc:document.getElementById('albDesc').value.trim(),
+    fecha:document.getElementById('albFecha').value.trim(),
+    estilo:albEstiloSel,
+    evId:albEvId||null,
+    creadoEn:albEditing?(dAlbumes[albEditing]?.creadoEn||new Date().toISOString()):new Date().toISOString()
+  };
   const r=albEditing?ref(db,'albumes/'+albEditing):push(ref(db,'albumes'));
   await set(r,data);
-  cerrarModalAlbum(); toast(albEditing?'Álbum actualizado ✓':'Álbum creado ✓');
+  cerrarModalAlbum();
+  toast(albEditing?'Álbum actualizado ✓':'Álbum creado ✓');
   if(albEditing&&albumActual===albEditing) setTimeout(()=>abrirAlbum(albEditing),200);
+  else if(albEvId&&evActual===albEvId) setTimeout(()=>abrirEv(albEvId),200);
 };
 
 window.eliminarAlbum=async function(id){
