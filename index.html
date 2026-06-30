@@ -298,6 +298,62 @@ h1,h2,h3,h4{font-family:'Fraunces',serif;font-weight:300;}
 .iopt{font-size:22px;cursor:pointer;padding:4px;border-radius:6px;border:2px solid var(--bdr);transition:border-color .15s;}
 .iopt.sel{border-color:var(--rose);}
 
+/* ÁLBUMES */
+.album-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-bottom:20px;}
+.album-card{border-radius:14px;overflow:hidden;cursor:pointer;position:relative;aspect-ratio:4/3;transition:transform .2s,box-shadow .2s;background:var(--bg3);}
+.album-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.15);}
+.album-cover{width:100%;height:100%;object-fit:cover;display:block;}
+.album-cover-empty{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:40px;}
+.album-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(36,28,24,.82) 0%,transparent 55%);display:flex;flex-direction:column;justify-content:flex-end;padding:14px;}
+.album-title{font-family:'Fraunces',serif;font-size:16px;color:white;font-weight:300;margin-bottom:2px;}
+.album-meta{font-size:11px;color:rgba(255,255,255,.55);}
+.album-del{position:absolute;top:8px;right:8px;width:26px;height:26px;background:rgba(36,28,24,.7);border:none;border-radius:50%;color:white;font-size:13px;display:none;align-items:center;justify-content:center;cursor:pointer;}
+.album-card:hover .album-del{display:flex;}
+.album-det-hdr{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
+/* Estilos de álbum */
+.estilo-cuadricula .inner-gall{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;}
+.estilo-masonry .inner-gall{columns:3 150px;gap:10px;}
+.estilo-masonry .fcard{break-inside:avoid;margin-bottom:10px;}
+.estilo-masonry .fcard img{aspect-ratio:unset;height:auto;}
+.estilo-polaroid .inner-gall{display:flex;flex-wrap:wrap;gap:18px;justify-content:center;padding:10px;}
+.estilo-polaroid .fcard{width:170px;background:white;padding:9px 9px 30px;box-shadow:0 4px 18px rgba(0,0,0,.14);border-radius:2px;border:none;transition:transform .2s;}
+.estilo-polaroid .fcard:hover{transform:scale(1.05) rotate(0deg)!important;}
+.estilo-polaroid .fcard:nth-child(odd){transform:rotate(-1.5deg);}
+.estilo-polaroid .fcard:nth-child(3n){transform:rotate(1deg);}
+.estilo-polaroid .fcard img{aspect-ratio:1;width:100%;object-fit:cover;}
+.estilo-tira .inner-gall{display:flex;overflow-x:auto;gap:10px;padding-bottom:10px;}
+.estilo-tira .fcard{width:240px;flex-shrink:0;}
+.estilo-tira .fcard img{aspect-ratio:3/2;width:100%;height:auto;}
+.estilo-minimal .inner-gall{display:flex;flex-direction:column;gap:20px;}
+.estilo-minimal .fcard{border-radius:0;border:none;border-bottom:1px solid var(--bdr);background:transparent;display:grid;grid-template-columns:200px 1fr;gap:16px;}
+.estilo-minimal .fcard img{aspect-ratio:3/2;width:100%;border-radius:8px;}
+.estilo-minimal .fcard-info{padding:8px 0;}
+/* Estilos selector */
+.estilo-opt{display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 14px;border-radius:10px;border:1.5px solid var(--bdr);cursor:pointer;transition:all .15s;min-width:80px;text-align:center;}
+.estilo-opt .eico{font-size:22px;}
+.estilo-opt span{font-size:11px;color:var(--dim);}
+.estilo-opt.sel{border-color:var(--rose);background:var(--rose-l);}
+.estilo-opt.sel span{color:var(--rose-d);}
+/* Rol picker */
+.rol-opt{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 14px;border-radius:10px;border:1.5px solid var(--bdr);cursor:pointer;transition:all .15s;min-width:100px;text-align:center;}
+.rol-opt span{font-size:12px;font-weight:500;color:var(--ink);}
+.rol-opt small{font-size:10px;color:var(--dim);}
+.rol-opt.selected{border-color:var(--rose);background:var(--rose-l);}
+.rol-opt.selected span,.rol-opt.selected small{color:var(--rose-d);}
+.sec-chk{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:100px;border:1px solid var(--bdr);font-size:12px;cursor:pointer;transition:all .15s;user-select:none;}
+.sec-chk input{display:none;}
+.sec-chk.on{background:var(--rose-l);border-color:var(--rose-m);color:var(--rose-d);}
+.rol-badge{font-size:10px;padding:2px 7px;border-radius:100px;font-weight:500;}
+.rol-editor{background:var(--sage-l);color:var(--sage-d);}
+.rol-familia{background:var(--sand-l);color:var(--sand-d);}
+.rol-personalizado{background:var(--rose-l);color:var(--rose-d);}
+.rol-admin{background:var(--rose-l);color:var(--rose-d);}
+/* RESPONSIVE */
+@media(max-width:700px){
+  .estilo-masonry .inner-gall{columns:2 120px;}
+  .estilo-minimal .fcard{grid-template-columns:1fr;}
+  .album-grid{grid-template-columns:1fr 1fr;}
+}
 /* RESPONSIVE */
 @media(max-width:700px){
   .body{grid-template-columns:1fr;}
@@ -463,12 +519,12 @@ h1,h2,h3,h4{font-family:'Fraunces',serif;font-weight:300;}
 
       <!-- GALERÍA -->
       <div class="sec" id="sec-galeria">
-        <div class="sec-hd"><h2>Galería de Amelia</h2><p>Fotos del embarazo, ecografías y preparativos.</p></div>
-        <div class="dropzone" id="dzGlobal" onclick="document.getElementById('fiGlobal').click()">
-          <p>📷 <strong>Arrastra fotos aquí</strong> o haz clic<br>JPG, PNG · Múltiples archivos</p>
+        <div class="sec-hd" style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+          <div><h2>Galería de Amelia</h2><p>Álbumes de fotos del embarazo y preparativos.</p></div>
+          <button class="btn btn-rose" onclick="abrirModalAlbum()" id="btnNuevoAlbum">+ Álbum</button>
         </div>
-        <input type="file" id="fiGlobal" multiple accept="image/*" style="display:none" onchange="subirFotos(this.files,null)">
-        <div class="gallgrid" id="gallGlobal"></div>
+        <div id="albumsVista"></div>
+        <div id="albumDetalle" style="display:none;"></div>
       </div>
 
       <!-- NOTAS -->
@@ -498,19 +554,42 @@ h1,h2,h3,h4{font-family:'Fraunces',serif;font-weight:300;}
 
       <!-- ACCESO -->
       <div class="sec" id="sec-acceso">
-        <div class="sec-hd"><h2>Acceso a la app</h2><p>Administra quién puede entrar al Nido de Amelia.</p></div>
-        <div style="max-width:500px;">
+        <div class="sec-hd"><h2>Acceso a la app</h2><p>Administra quién puede entrar y qué puede ver.</p></div>
+        <div style="max-width:560px;">
           <div style="background:var(--w);border:1px solid var(--bdr);border-radius:12px;overflow:hidden;margin-bottom:16px;">
-            <div style="padding:14px 16px;border-bottom:1px solid var(--bdr);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--dim);font-weight:500;">Usuarios autorizados</div>
-            <div id="usuariosList" style="padding:4px 0;"></div>
-            <div style="padding:12px 16px;border-top:1px solid var(--bdr);display:flex;gap:8px;">
-              <input type="email" id="invEmail" placeholder="correo@gmail.com" style="flex:1;padding:8px 11px;border:1px solid var(--bdr);border-radius:var(--r);font-size:13px;background:var(--bg);color:var(--ink);">
-              <input type="text" id="invNombre" placeholder="Nombre" style="width:110px;padding:8px 11px;border:1px solid var(--bdr);border-radius:var(--r);font-size:13px;background:var(--bg);color:var(--ink);">
-              <button class="btn btn-rose btn-sm" onclick="agregarInvitado()">+ Agregar</button>
+            <div style="padding:14px 16px;border-bottom:1px solid var(--bdr);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--dim);font-weight:500;">Usuarios con acceso</div>
+            <div id="usuariosList"></div>
+            <div style="padding:14px 16px;border-top:1px solid var(--bdr);">
+              <div style="font-size:12px;font-weight:500;color:var(--ink);margin-bottom:10px;">Invitar a alguien nuevo</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+                <input type="email" id="invEmail" placeholder="correo@gmail.com" style="padding:8px 11px;border:1px solid var(--bdr);border-radius:var(--r);font-size:13px;background:var(--bg);color:var(--ink);">
+                <input type="text" id="invNombre" placeholder="Nombre" style="padding:8px 11px;border:1px solid var(--bdr);border-radius:var(--r);font-size:13px;background:var(--bg);color:var(--ink);">
+              </div>
+              <div style="margin-bottom:8px;">
+                <div style="font-size:11px;color:var(--dim);margin-bottom:6px;letter-spacing:1px;text-transform:uppercase;font-weight:500;">Tipo de acceso</div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;" id="rolPicker">
+                  <label class="rol-opt" data-rol="editor"><input type="radio" name="invRol" value="editor" checked style="display:none"> <span>✏️ Editor</span><small>Ve y edita todo</small></label>
+                  <label class="rol-opt" data-rol="familia"><input type="radio" name="invRol" value="familia" style="display:none"> <span>👨‍👩‍👧 Familia</span><small>Solo lectura</small></label>
+                  <label class="rol-opt" data-rol="personalizado"><input type="radio" name="invRol" value="personalizado" style="display:none"> <span>⚙️ Personalizado</span><small>Tú eliges</small></label>
+                </div>
+              </div>
+              <div id="seccionesPicker" style="display:none;margin-bottom:10px;">
+                <div style="font-size:11px;color:var(--dim);margin-bottom:6px;font-weight:500;">Secciones visibles:</div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;" id="seccionesCheck">
+                  <label class="sec-chk"><input type="checkbox" value="inicio" checked> 🏠 Inicio</label>
+                  <label class="sec-chk"><input type="checkbox" value="eventos"> 🎀 Eventos</label>
+                  <label class="sec-chk"><input type="checkbox" value="tareas"> ✅ Tareas</label>
+                  <label class="sec-chk"><input type="checkbox" value="hitos" checked> 🌟 Hitos</label>
+                  <label class="sec-chk"><input type="checkbox" value="galeria" checked> 📷 Galería</label>
+                  <label class="sec-chk"><input type="checkbox" value="notas"> 📓 Notas</label>
+                  <label class="sec-chk"><input type="checkbox" value="lista"> 🛍 Lista</label>
+                </div>
+              </div>
+              <button class="btn btn-rose btn-sm" onclick="agregarInvitado()">+ Agregar usuario</button>
             </div>
           </div>
           <div style="background:var(--sand-l);border:1px solid var(--sand-m);border-radius:10px;padding:12px 14px;font-size:12px;color:var(--sand-d);line-height:1.7;">
-            ⚠️ Solo tú (Fabián) puedes administrar el acceso. La persona invitada podrá ver y editar todo el contenido de la app.
+            ⚠️ Solo tú (Fabián) puedes administrar el acceso. Los cambios se aplican de inmediato — la próxima vez que la persona abra la app verá las secciones asignadas.
           </div>
         </div>
       </div>
@@ -622,6 +701,29 @@ h1,h2,h3,h4{font-family:'Fraunces',serif;font-weight:300;}
     <div class="mactions">
       <button class="btn btn-outline" onclick="cerrarModalHito()">Cancelar</button>
       <button class="btn btn-rose" onclick="guardarHito()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<div class="moverlay" id="mAlbum" onclick="if(event.target===this)cerrarModalAlbum()">
+  <div class="modal">
+    <h3 id="mAlbumTitle">Nuevo álbum</h3>
+    <div class="frow"><label>Nombre del álbum</label><input type="text" id="albNombre" placeholder="Ej: Ecografías, Baby Shower…"></div>
+    <div class="frow"><label>Descripción (opcional)</label><input type="text" id="albDesc" placeholder="Ej: Semanas 12 a 20"></div>
+    <div class="frow"><label>Fecha</label><input type="text" id="albFecha" placeholder="Ej: Julio 2026"></div>
+    <div class="frow"><label>Estilo visual</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;" id="estiloRow">
+        <div class="estilo-opt sel" onclick="selEstilo(this,'cuadricula')"><div class="eico">⊞</div><span>Cuadrícula</span></div>
+        <div class="estilo-opt" onclick="selEstilo(this,'masonry')"><div class="eico">⧉</div><span>Mosaico</span></div>
+        <div class="estilo-opt" onclick="selEstilo(this,'polaroid')"><div class="eico">🖼</div><span>Polaroid</span></div>
+        <div class="estilo-opt" onclick="selEstilo(this,'tira')"><div class="eico">◫</div><span>Tira</span></div>
+        <div class="estilo-opt" onclick="selEstilo(this,'minimal')"><div class="eico">☰</div><span>Minimal</span></div>
+      </div>
+      <input type="hidden" id="albEstilo" value="cuadricula">
+    </div>
+    <div class="mactions">
+      <button class="btn btn-outline" onclick="cerrarModalAlbum()">Cancelar</button>
+      <button class="btn btn-rose" onclick="guardarAlbum()">Guardar álbum</button>
     </div>
   </div>
 </div>
@@ -745,6 +847,7 @@ onAuthStateChanged(auth, async user => {
     // Mostrar sección acceso solo a admin
     if(esAdmin()) document.getElementById('niAcceso').style.display='';
     initListeners();
+    aplicarPermisos();
     updateCountdown();
     setInterval(updateCountdown,60000);
   } else {
@@ -798,31 +901,87 @@ function initListeners(){
   onValue(ref(db,'tareas'),s=>{ dTareas=s.val()||{}; renderTareas(); renderDashTareas(); updateStats(); });
   onValue(ref(db,'hitos'),s=>{ dHitos=s.val()||{}; renderHitos(); updateStats(); if(!s.val()) sembrarHitos(); });
   onValue(ref(db,'notas'),s=>{ dNotas=s.val()||{}; renderNotas(); renderDashNota(); updateStats(); });
-  onValue(ref(db,'galeria'),s=>{ dGaleria=s.val()||{}; renderGaleria(); updateStats(); });
+  onValue(ref(db,'galeria'),s=>{ dGaleria=s.val()||{}; if(albumActual) abrirAlbum(albumActual); else renderAlbumsGrid(); updateStats(); });
+  onValue(ref(db,'albumes'),s=>{ dAlbumes=s.val()||{}; if(!albumActual) renderAlbumsGrid(); });
   onValue(ref(db,'lista'),s=>{ dLista=s.val()||{}; renderLista(); if(!s.val()) sembrarLista(); });
   onValue(ref(db,'eventos'),s=>{ dEventos=s.val()||{}; renderEvsGrid(); renderDashEv(); updateStats(); });
-  onValue(ref(db,'acceso'),s=>{ dUsuarios=s.val()||{}; if(esAdmin()) renderUsuariosList(); });
+  onValue(ref(db,'acceso'),s=>{ dUsuarios=s.val()||{}; if(esAdmin()) renderUsuariosList(); aplicarPermisos(); });
+}
+
+// ── PERMISOS ──────────────────────────────────────────────────
+function getRol(){
+  if(!CU) return 'familia';
+  if(USUARIOS_BASE[CU.email]) return USUARIOS_BASE[CU.email].admin ? 'admin' : 'editor';
+  const u = Object.values(dUsuarios).find(u=>u.email===CU.email);
+  return u ? (u.rol||'familia') : 'familia';
+}
+
+function getSecciones(){
+  if(!CU) return [];
+  if(USUARIOS_BASE[CU.email]) return ['inicio','eventos','tareas','hitos','galeria','notas','lista'];
+  const u = Object.values(dUsuarios).find(u=>u.email===CU.email);
+  if(!u) return [];
+  if(u.rol==='editor') return ['inicio','eventos','tareas','hitos','galeria','notas','lista'];
+  if(u.rol==='familia') return ['inicio','hitos','galeria'];
+  return u.secciones || ['inicio','hitos','galeria'];
+}
+
+function puedeVer(sec){ return getSecciones().includes(sec); }
+
+function aplicarPermisos(){
+  const secs = getSecciones();
+  const mapSec = ['inicio','eventos','tareas','hitos','galeria','notas','lista'];
+  mapSec.forEach(s=>{
+    const ni = document.querySelector(`.ni[onclick*="navTo('${s}')"]`);
+    const mn = document.getElementById('mn-'+s);
+    if(ni) ni.style.display = secs.includes(s)?'':'none';
+    if(mn) mn.style.display = secs.includes(s)?'':'none';
+  });
+  // Mostrar acceso solo admin
+  const niA=document.getElementById('niAcceso');
+  if(niA) niA.style.display=esAdmin()?'':'none';
+  // Botón nuevo álbum
+  const bna=document.getElementById('btnNuevoAlbum');
+  if(bna) bna.style.display=getRol()!=='familia'?'':'none';
 }
 
 // ══════ ACCESO ════════════════════════════════════════════════
 function renderUsuariosList(){
   const list = document.getElementById('usuariosList');
   if(!list) return;
-  // Usuarios base
-  const base = Object.entries(USUARIOS_BASE).map(([email,info])=>({email,nombre:info.nombre,base:true,admin:info.admin}));
-  // Usuarios dinámicos
-  const dinamicos = Object.entries(dUsuarios).map(([key,u])=>({email:u.email,nombre:u.nombre,key,base:false,admin:false}));
-  const todos = [...base,...dinamicos];
+  const base = Object.entries(USUARIOS_BASE).map(([email,info])=>({email,nombre:info.nombre,rol:info.admin?'admin':'editor',base:true}));
+  const din = Object.entries(dUsuarios).map(([key,u])=>({email:u.email,nombre:u.nombre,rol:u.rol||'familia',secciones:u.secciones,key,base:false}));
+  const todos = [...base,...din];
+  const rolLbl = {admin:'Admin',editor:'Editor',familia:'Familia',personalizado:'Personalizado'};
   list.innerHTML = todos.map(u=>`
     <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--bg2);">
-      <div class="uav ${u.email===CU?.email?CU.av:'av-f'}" style="width:32px;height:32px;font-size:13px;">${u.nombre[0].toUpperCase()}</div>
+      <div class="uav av-f" style="width:32px;height:32px;font-size:13px;">${(u.nombre||'?')[0].toUpperCase()}</div>
       <div style="flex:1;">
-        <div style="font-size:13px;font-weight:500;color:var(--ink);">${esc(u.nombre)} ${u.admin?'<span style="font-size:10px;background:var(--rose-l);color:var(--rose-d);padding:1px 6px;border-radius:100px;">admin</span>':''}</div>
+        <div style="font-size:13px;font-weight:500;color:var(--ink);">${esc(u.nombre)}</div>
         <div style="font-size:11px;color:var(--dim);">${esc(u.email)}</div>
+        ${u.rol==='personalizado'&&u.secciones?`<div style="font-size:10px;color:var(--dim);margin-top:2px;">Secciones: ${u.secciones.join(', ')}</div>`:''}
       </div>
+      <span class="rol-badge rol-${u.rol}">${rolLbl[u.rol]||u.rol}</span>
       ${!u.base&&esAdmin()?`<button class="btn btn-ghost btn-sm" onclick="quitarInvitado('${u.key}')" style="color:#c04040;">Quitar</button>`:''}
     </div>
   `).join('');
+
+  // Setup rol picker interactivity
+  document.querySelectorAll('.rol-opt').forEach(opt=>{
+    opt.addEventListener('click',()=>{
+      document.querySelectorAll('.rol-opt').forEach(o=>o.classList.remove('selected'));
+      opt.classList.add('selected');
+      const rol = opt.dataset.rol;
+      document.getElementById('seccionesPicker').style.display = rol==='personalizado'?'block':'none';
+    });
+  });
+  // sec-chk toggle
+  document.querySelectorAll('.sec-chk').forEach(chk=>{
+    chk.addEventListener('click',()=>chk.classList.toggle('on'));
+  });
+  // Primer rol seleccionado por defecto
+  const first = document.querySelector('.rol-opt');
+  if(first) first.classList.add('selected');
 }
 
 window.agregarInvitado = async function(){
@@ -833,7 +992,15 @@ window.agregarInvitado = async function(){
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ toast('Correo inválido'); return; }
   if(USUARIOS_BASE[email]){ toast('Ese correo ya tiene acceso'); return; }
   if(Object.values(dUsuarios).find(u=>u.email===email)){ toast('Ese correo ya fue invitado'); return; }
-  await push(ref(db,'acceso'),{email,nombre,agregadoPor:CU.email,fecha:new Date().toISOString()});
+  const rolSel = document.querySelector('.rol-opt.selected')?.dataset?.rol || 'familia';
+  let secciones = null;
+  if(rolSel==='personalizado'){
+    secciones = [...document.querySelectorAll('.sec-chk.on')].map(c=>c.querySelector('input').value);
+    if(!secciones.length){ toast('Selecciona al menos una sección'); return; }
+  }
+  const data = {email,nombre,rol:rolSel,agregadoPor:CU.email,fecha:new Date().toISOString()};
+  if(secciones) data.secciones=secciones;
+  await push(ref(db,'acceso'),data);
   document.getElementById('invEmail').value='';
   document.getElementById('invNombre').value='';
   toast('✓ '+nombre+' puede entrar ahora');
@@ -850,7 +1017,7 @@ function updateStats(){
   const ta=Object.values(dTareas);
   document.getElementById('std').textContent=ta.filter(t=>t.done).length;
   document.getElementById('stp').textContent=ta.filter(t=>!t.done).length;
-  document.getElementById('stf').textContent=Object.values(dGaleria).filter(f=>!f.evId).length;
+  document.getElementById('stf').textContent=Object.keys(dGaleria).length;
   document.getElementById('sth').textContent=Object.values(dHitos).filter(h=>h.status==='done').length;
   document.getElementById('stn').textContent=Object.keys(dNotas).length;
   const pend=ta.filter(t=>!t.done).length;
@@ -1363,13 +1530,149 @@ window.guardarHito=async function(){
 };
 window.eliminarH=async function(id){ if(confirm('¿Eliminar?')) await remove(ref(db,'hitos/'+id)); };
 
-// ══════ GALERÍA ═══════════════════════════════════════════════
-const dzG=document.getElementById('dzGlobal');
-dzG.addEventListener('dragover',e=>{e.preventDefault();dzG.classList.add('drag');});
-dzG.addEventListener('dragleave',()=>dzG.classList.remove('drag'));
-dzG.addEventListener('drop',e=>{e.preventDefault();dzG.classList.remove('drag');subirFotos(e.dataTransfer.files,null);});
+// ══════ ÁLBUMES ═══════════════════════════════════════════════
+let dAlbumes = {};
+let albumActual = null;
+let albEstiloSel = 'cuadricula';
 
-window.subirFotos=async function(files,evId){
+// Listener álbumes
+function initAlbumListener(){
+  onValue(ref(db,'albumes'),s=>{ dAlbumes=s.val()||{}; if(!albumActual) renderAlbumsGrid(); updateStats(); });
+}
+
+function renderAlbumsGrid(){
+  const vista = document.getElementById('albumsVista');
+  const det = document.getElementById('albumDetalle');
+  if(!vista) return;
+  vista.style.display=''; det.style.display='none'; albumActual=null;
+  const items = Object.entries(dAlbumes).sort((a,b)=>b[1].creadoEn>a[1].creadoEn?1:-1);
+
+  const puedeEditar = puedeVer('galeria') && getRol() !== 'familia';
+
+  let html = '';
+  if(puedeEditar){
+    html += `<div style="margin-bottom:14px;display:flex;gap:8px;align-items:center;">
+      <button class="btn btn-rose" onclick="abrirModalAlbum()">+ Nuevo álbum</button>
+    </div>`;
+  }
+
+  if(!items.length){
+    html += '<div class="empty"><div class="empty-icon">📷</div><h4>Sin álbumes aún</h4><p>Crea el primer álbum para organizar tus fotos.</p></div>';
+    vista.innerHTML = html; return;
+  }
+
+  html += '<div class="album-grid">';
+  html += items.map(([id,alb])=>{
+    const fotos = Object.values(dGaleria).filter(f=>f.albumId===id);
+    const cover = fotos.find(f=>f.url);
+    return `<div class="album-card" onclick="abrirAlbum('${id}')">
+      ${cover?`<img class="album-cover" src="${esc(cover.url)}" alt="">`:`<div class="album-cover-empty">📷</div>`}
+      <div class="album-overlay">
+        <div class="album-title">${esc(alb.nombre||'Sin título')}</div>
+        <div class="album-meta">${fotos.length} foto${fotos.length!==1?'s':''} ${alb.fecha?'· '+esc(alb.fecha):''}</div>
+      </div>
+      ${puedeEditar?`<button class="album-del" onclick="event.stopPropagation();eliminarAlbum('${id}')">×</button>`:''}
+    </div>`;
+  }).join('');
+  html += '</div>';
+  vista.innerHTML = html;
+}
+
+function abrirAlbum(id){
+  albumActual = id;
+  const alb = dAlbumes[id]; if(!alb) return;
+  const fotos = Object.entries(dGaleria).filter(([,f])=>f.albumId===id).sort((a,b)=>b[1].fecha>a[1].fecha?1:-1);
+  const estilo = alb.estilo || 'cuadricula';
+  const puedeEditar = getRol() !== 'familia';
+
+  const vista = document.getElementById('albumsVista'); vista.style.display='none';
+  const det = document.getElementById('albumDetalle'); det.style.display='block';
+
+  det.innerHTML = `
+    <div class="album-det-hdr">
+      <button class="btn btn-outline btn-sm" onclick="mostrarAlbumsGrid()">← Álbumes</button>
+      <div style="flex:1">
+        <div style="font-family:'Fraunces',serif;font-size:22px;color:var(--ink);font-weight:300;">${esc(alb.nombre||'')}</div>
+        ${alb.desc?`<div style="font-size:12px;color:var(--dim)">${esc(alb.desc)}</div>`:''}
+        ${alb.fecha?`<div style="font-size:11px;color:var(--dim)">📅 ${esc(alb.fecha)}</div>`:''}
+      </div>
+      ${puedeEditar?`<button class="btn btn-outline btn-sm" onclick="abrirModalAlbum('${id}')">✏️ Editar</button>`:''}
+      ${puedeEditar?`<button class="btn btn-rose btn-sm" onclick="document.getElementById('fiAlbum_${id}').click()">+ Fotos</button>`:''}
+    </div>
+    ${puedeEditar?`<input type="file" id="fiAlbum_${id}" multiple accept="image/*" style="display:none" onchange="subirFotosAlbum(this.files,'${id}')">`:''}
+    ${puedeEditar&&!fotos.length?`<div class="dropzone" onclick="document.getElementById('fiAlbum_${id}').click()"><p>📷 <strong>Arrastra fotos aquí</strong> o haz clic</p></div>`:''}
+    <div class="estilo-${estilo}">
+      <div class="inner-gall">
+        ${fotos.length===0?'<div class="empty"><div class="empty-icon">📷</div><h4>Sin fotos aún</h4><p>Agrega fotos a este álbum.</p></div>':
+        fotos.map(([fid,f])=>`<div class="fcard" onclick="abrirLightbox('${esc(f.url)}')">
+          <img src="${esc(f.url)}" alt="${esc(f.name)}" loading="lazy">
+          ${puedeEditar?`<button class="fcard-del" onclick="event.stopPropagation();eliminarFoto('${fid}','${esc(f.url)}')">×</button>`:''}
+          <div class="fcard-info"><div class="fcard-name">${esc(f.name)}</div><div class="fcard-date">${fCorta(f.fecha)}${f.autor?' · '+esc(f.autor):''}</div></div>
+        </div>`).join('')}
+      </div>
+    </div>`;
+
+  // Setup drag drop
+  const dz = det.querySelector('.dropzone');
+  if(dz){
+    dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag');});
+    dz.addEventListener('dragleave',()=>dz.classList.remove('drag'));
+    dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('drag');subirFotosAlbum(e.dataTransfer.files,id);});
+  }
+}
+
+function mostrarAlbumsGrid(){
+  albumActual=null;
+  document.getElementById('albumsVista').style.display='';
+  document.getElementById('albumDetalle').style.display='none';
+  renderAlbumsGrid();
+}
+
+window.abrirModalAlbum = function(id){
+  albEditing = id||null;
+  document.getElementById('mAlbumTitle').textContent = id?'Editar álbum':'Nuevo álbum';
+  if(id&&dAlbumes[id]){
+    const alb=dAlbumes[id];
+    document.getElementById('albNombre').value=alb.nombre||'';
+    document.getElementById('albDesc').value=alb.desc||'';
+    document.getElementById('albFecha').value=alb.fecha||'';
+    albEstiloSel=alb.estilo||'cuadricula';
+  } else {
+    document.getElementById('albNombre').value='';
+    document.getElementById('albDesc').value='';
+    document.getElementById('albFecha').value='';
+    albEstiloSel='cuadricula';
+  }
+  document.getElementById('albEstilo').value=albEstiloSel;
+  document.querySelectorAll('.estilo-opt').forEach(o=>o.classList.toggle('sel',o.onclick.toString().includes(albEstiloSel)));
+  document.getElementById('mAlbum').classList.add('on');
+};
+window.cerrarModalAlbum=()=>document.getElementById('mAlbum').classList.remove('on');
+window.selEstilo=function(el,estilo){ albEstiloSel=estilo; document.getElementById('albEstilo').value=estilo; document.querySelectorAll('.estilo-opt').forEach(o=>o.classList.remove('sel')); el.classList.add('sel'); };
+
+let albEditing = null;
+window.guardarAlbum=async function(){
+  const nombre=document.getElementById('albNombre').value.trim();
+  if(!nombre){ toast('Escribe el nombre del álbum'); return; }
+  const data={nombre,desc:document.getElementById('albDesc').value.trim(),fecha:document.getElementById('albFecha').value.trim(),estilo:albEstiloSel,creadoEn:albEditing?(dAlbumes[albEditing]?.creadoEn||new Date().toISOString()):new Date().toISOString()};
+  const r=albEditing?ref(db,'albumes/'+albEditing):push(ref(db,'albumes'));
+  await set(r,data);
+  cerrarModalAlbum(); toast(albEditing?'Álbum actualizado ✓':'Álbum creado ✓');
+  if(albEditing&&albumActual===albEditing) setTimeout(()=>abrirAlbum(albEditing),200);
+};
+
+window.eliminarAlbum=async function(id){
+  if(!confirm('¿Eliminar el álbum? Las fotos también se eliminarán.')) return;
+  const fotos=Object.entries(dGaleria).filter(([,f])=>f.albumId===id);
+  for(const [fid,f] of fotos){
+    await remove(ref(db,'galeria/'+fid));
+    try{ await deleteObject(sref(storage,f.url)); }catch(e){}
+  }
+  await remove(ref(db,'albumes/'+id));
+  mostrarAlbumsGrid(); toast('Álbum eliminado');
+};
+
+window.subirFotosAlbum=async function(files,albumId){
   if(!files||!files.length) return;
   toast('Subiendo '+files.length+' foto(s)…');
   for(const file of Array.from(files)){
@@ -1379,23 +1682,22 @@ window.subirFotos=async function(files,evId){
       const sr=sref(storage,'galeria/'+key+'_'+file.name);
       const snap=await uploadBytes(sr,file);
       const url=await getDownloadURL(snap.ref);
-      await set(ref(db,'galeria/'+key),{url,name:file.name,fecha:new Date().toISOString(),autor:CU?.nombre||'',evId:evId||null});
+      await set(ref(db,'galeria/'+key),{url,name:file.name,fecha:new Date().toISOString(),autor:CU?.nombre||'',albumId:albumId});
     }catch(e){ toast('Error: '+e.message); }
   }
   toast('Fotos guardadas ✓');
-  if(evId&&evActual===evId) setTimeout(()=>abrirEv(evId),500);
+  setTimeout(()=>abrirAlbum(albumId),500);
 };
 
-function renderGaleria(){
-  const g=document.getElementById('gallGlobal');
-  const items=Object.entries(dGaleria).filter(([,f])=>!f.evId).sort((a,b)=>b[1].fecha>a[1].fecha?1:-1);
-  if(!items.length){ g.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="empty-icon">📷</div><h4>Sin fotos</h4><p>Sube las primeras fotos del embarazo.</p></div>'; return; }
-  g.innerHTML=items.map(([id,f])=>`<div class="fcard" onclick="abrirLightbox('${esc(f.url)}')">
-    <img src="${esc(f.url)}" alt="${esc(f.name)}" loading="lazy">
-    <button class="fcard-del" onclick="event.stopPropagation();eliminarFoto('${id}','${esc(f.url)}')">×</button>
-    <div class="fcard-info"><div class="fcard-name">${esc(f.name)}</div><div class="fcard-date">${fCorta(f.fecha)} · ${esc(f.autor||'')}</div></div>
-  </div>`).join('');
-}
+window.subirFotos=window.subirFotosAlbum; // compat
+
+function renderGaleria(){ renderAlbumsGrid(); }
+
+window.abrirAlbum = abrirAlbum;
+window.mostrarAlbumsGrid = mostrarAlbumsGrid;
+window.renderAlbumsGrid = renderAlbumsGrid;
+
+// ══════ GALERÍA HELPERS ═══════════════════════════════════════
 
 window.abrirLightbox=function(url){ document.getElementById('lbImg').src=url; document.getElementById('lightbox').classList.add('show'); };
 window.cerrarLightbox=function(){ document.getElementById('lightbox').classList.remove('show'); };
