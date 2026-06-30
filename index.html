@@ -348,6 +348,48 @@ h1,h2,h3,h4{font-family:'Fraunces',serif;font-weight:300;}
 .rol-familia{background:var(--sand-l);color:var(--sand-d);}
 .rol-personalizado{background:var(--rose-l);color:var(--rose-d);}
 .rol-admin{background:var(--rose-l);color:var(--rose-d);}
+/* LISTA RICA */
+.lista-rich-item{background:var(--w);border:1px solid var(--bdr);border-radius:12px;padding:14px 16px;margin-bottom:10px;transition:all .15s;}
+.lista-rich-item:hover{border-color:var(--bdr2);}
+.lista-rich-item.comprado{opacity:.6;}
+.lri-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;}
+.lri-cb{width:20px;height:20px;border-radius:50%;border:2px solid var(--bdr);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;margin-top:1px;transition:all .2s;}
+.lri-cb.done{background:var(--sage);border-color:var(--sage);}
+.lri-cb.done::after{content:'✓';font-size:11px;color:white;}
+.lri-body{flex:1;min-width:0;}
+.lri-nombre{font-size:14px;font-weight:500;color:var(--ink);margin-bottom:3px;}
+.lri-nombre.done{text-decoration:line-through;color:var(--dim);}
+.lri-nota{font-size:12px;color:var(--dim);line-height:1.5;margin-bottom:6px;}
+.lri-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.lri-precio{font-size:12px;color:var(--sage-d);font-weight:500;}
+.lri-prio{font-size:10px;padding:2px 7px;border-radius:100px;font-weight:500;}
+.lri-prio-alta{background:var(--rose-l);color:var(--rose-d);}
+.lri-prio-media{background:var(--sand-l);color:var(--sand-d);}
+.lri-prio-baja{background:var(--sage-l);color:var(--sage-d);}
+.lri-link{font-size:11px;color:var(--rose-d);text-decoration:none;}
+.lri-link:hover{text-decoration:underline;}
+.lri-cat{font-size:10px;color:var(--dim);padding:2px 7px;background:var(--bg2);border-radius:100px;}
+.lri-acts{display:flex;gap:4px;flex-shrink:0;}
+.lista-resumen-stat{background:var(--w);border:1px solid var(--bdr);border-radius:10px;padding:10px 13px;min-width:110px;}
+.lista-resumen-stat .n{font-family:'Fraunces',serif;font-size:20px;color:var(--ink);line-height:1;}
+.lista-resumen-stat .l{font-size:10px;color:var(--dim);margin-top:2px;}
+/* PARTO RICO */
+.parto-card{background:var(--w);border:1px solid var(--bdr);border-radius:14px;overflow:hidden;margin-bottom:14px;}
+.parto-card-hdr{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--bdr);}
+.parto-card-ico{font-size:22px;}
+.parto-card-title{flex:1;font-size:14px;font-weight:500;color:var(--ink);}
+.parto-card-prog{font-size:11px;color:var(--dim);}
+.parto-card-body{padding:14px 16px;}
+.parto-richtext{width:100%;min-height:80px;border:1px solid var(--bdr);border-radius:var(--r);padding:9px 11px;font-size:13px;background:var(--bg);color:var(--ink);resize:vertical;line-height:1.6;font-family:'DM Sans',sans-serif;transition:border-color .2s;margin-bottom:10px;}
+.parto-richtext:focus{outline:none;border-color:var(--rose-m);background:var(--w);}
+.parto-check-item{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--bg2);}
+.parto-check-item:last-child{border-bottom:none;}
+/* INICIO ALERTAS */
+.inicio-alerta{background:var(--rose-l);border:1px solid var(--rose-m);border-radius:10px;padding:11px 14px;margin-bottom:10px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:all .15s;}
+.inicio-alerta:hover{border-color:var(--rose);background:var(--rose-m);}
+.inicio-alerta-ico{font-size:18px;flex-shrink:0;}
+.inicio-alerta-txt{font-size:12px;color:var(--rose-d);line-height:1.5;}
+.inicio-alerta-txt strong{display:block;font-size:13px;margin-bottom:1px;}
 /* RESPONSIVE */
 @media(max-width:700px){
   .estilo-masonry .inner-gall{columns:2 120px;}
@@ -586,6 +628,9 @@ h1,h2,h3,h4{font-family:'Fraunces',serif;font-weight:300;}
                   <div class="sec-chk on" data-sec="galeria" onclick="toggleSec(this)">📷 Galería</div>
                   <div class="sec-chk" data-sec="notas" onclick="toggleSec(this)">📓 Notas</div>
                   <div class="sec-chk" data-sec="lista" onclick="toggleSec(this)">🛍 Lista</div>
+                  <div class="sec-chk on" data-sec="mensajes" onclick="toggleSec(this)">💌 Cartas</div>
+                  <div class="sec-chk" data-sec="medico" onclick="toggleSec(this)">🩺 Médico</div>
+                  <div class="sec-chk" data-sec="parto" onclick="toggleSec(this)">🗺️ Parto</div>
                 </div>
               </div>
               <button class="btn btn-rose btn-sm" onclick="agregarInvitado()">+ Agregar usuario</button>
@@ -652,13 +697,28 @@ h1,h2,h3,h4{font-family:'Fraunces',serif;font-weight:300;}
       <!-- PLAN DE PARTO -->
       <div class="sec" id="sec-parto">
         <div class="sec-hd"><h2>Plan de parto</h2><p>Todo organizado para el gran día de Amelia.</p></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;" id="partoGrid"></div>
+        <div id="partoGrid"></div>
       </div>
 
       <!-- LISTA -->
       <div class="sec" id="sec-lista">
-        <div class="sec-hd"><h2>Lista de compras</h2><p>Todo lo que Amelia va a necesitar.</p></div>
-        <div class="lista-layout" id="listaGrid"></div>
+        <div class="sec-hd" style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+          <div><h2>Lista de compras</h2><p>Todo lo que Amelia va a necesitar, con detalles de cada ítem.</p></div>
+          <button class="btn btn-rose" onclick="abrirModalListaItem()">+ Agregar ítem</button>
+        </div>
+        <div style="display:flex;gap:7px;margin-bottom:16px;flex-wrap:wrap;" id="listaFiltros">
+          <div class="fpill active" onclick="filtrarLista('todo',this)">Todo</div>
+          <div class="fpill" onclick="filtrarLista('pendiente',this)">Pendiente</div>
+          <div class="fpill" onclick="filtrarLista('comprado',this)">Comprado</div>
+          <div class="fpill" onclick="filtrarLista('ropa',this)">👗 Ropa</div>
+          <div class="fpill" onclick="filtrarLista('cuna',this)">🛏 Dormir</div>
+          <div class="fpill" onclick="filtrarLista('alim',this)">🍼 Alimentación</div>
+          <div class="fpill" onclick="filtrarLista('bano',this)">🛁 Baño</div>
+          <div class="fpill" onclick="filtrarLista('trans',this)">🚗 Transporte</div>
+          <div class="fpill" onclick="filtrarLista('salud',this)">💊 Salud</div>
+        </div>
+        <div id="listaResumen" style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;"></div>
+        <div id="listaRich"></div>
       </div>
     </main>
   </div>
@@ -800,6 +860,57 @@ h1,h2,h3,h4{font-family:'Fraunces',serif;font-weight:300;}
     <div class="mactions">
       <button class="btn btn-outline" onclick="cerrarModalMed()">Cancelar</button>
       <button class="btn btn-rose" onclick="guardarMed()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Lista Item -->
+<div class="moverlay" id="mListaItem" onclick="if(event.target===this)cerrarModalListaItem()">
+  <div class="modal" style="max-width:520px;">
+    <h3 id="mListaTitle">Nuevo ítem</h3>
+    <div class="frow"><label>Nombre del ítem</label><input type="text" id="liNombre" placeholder="Ej: Cuna convertible"></div>
+    <div class="frow"><label>Notas / especificaciones</label><textarea id="liNota" placeholder="Talla, color, marca, detalles, modelo, medidas…" style="min-height:70px;"></textarea></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;">
+      <div class="frow"><label>Cantidad</label><input type="text" id="liCantidad" placeholder="Ej: 3 unidades / talla RN"></div>
+      <div class="frow"><label>Estado</label>
+        <select id="liEstado">
+          <option value="pendiente">Pendiente</option>
+          <option value="cotizando">Cotizando</option>
+          <option value="reservado">Reservado / encargado</option>
+          <option value="comprado">Comprado</option>
+          <option value="regalado">Regalado</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;">
+      <div class="frow"><label>Categoría</label>
+        <select id="liCat">
+          <option value="ropa">👗 Ropa y accesorios</option>
+          <option value="cuna">🛏 Dormir</option>
+          <option value="alim">🍼 Alimentación</option>
+          <option value="bano">🛁 Baño e higiene</option>
+          <option value="trans">🚗 Transporte</option>
+          <option value="salud">💊 Salud</option>
+          <option value="otro">📦 Otro</option>
+        </select>
+      </div>
+      <div class="frow"><label>Prioridad</label>
+        <select id="liPrio">
+          <option value="media">🟡 Media</option>
+          <option value="alta">🔴 Alta</option>
+          <option value="baja">🟢 Baja</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;">
+      <div class="frow"><label>Precio estimado ($)</label><input type="number" id="liPrecio" placeholder="15000"></div>
+      <div class="frow"><label>Dónde comprarlo</label><input type="text" id="liTienda" placeholder="Ej: Paris, MercadoLibre"></div>
+    </div>
+    <div class="frow"><label>Link (opcional)</label><input type="url" id="liLink" placeholder="https://…"></div>
+    <div class="frow"><label>Adjunto / referencia</label><input type="file" id="liAdj" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx"><div id="liAdjActual" style="font-size:11px;color:var(--dim);margin-top:5px;"></div></div>
+    <div class="mactions">
+      <button class="btn btn-outline" onclick="cerrarModalListaItem()">Cancelar</button>
+      <button class="btn btn-rose" onclick="guardarListaItem()">Guardar</button>
     </div>
   </div>
 </div>
@@ -998,7 +1109,7 @@ function getRol(){
 
 function getSecciones(){
   if(!CU) return [];
-  if(USUARIOS_BASE[CU.email]) return ['inicio','eventos','tareas','hitos','galeria','notas','lista'];
+  if(USUARIOS_BASE[CU.email]) return ['inicio','eventos','tareas','hitos','galeria','notas','lista','mensajes','medico','parto'];
   const u = Object.values(dUsuarios).find(u=>u.email===CU.email);
   if(!u) return [];
   if(u.rol==='editor') return ['inicio','eventos','tareas','hitos','galeria','notas','lista','mensajes','medico','parto'];
@@ -1010,7 +1121,7 @@ function puedeVer(sec){ return getSecciones().includes(sec); }
 
 function aplicarPermisos(){
   const secs = getSecciones();
-  const mapSec = ['inicio','eventos','tareas','hitos','galeria','notas','lista'];
+  const mapSec = ['inicio','eventos','tareas','hitos','galeria','notas','lista','mensajes','medico','parto'];
   mapSec.forEach(s=>{
     const ni = document.querySelector(`.ni[onclick*="navTo('${s}')"]`);
     const mn = document.getElementById('mn-'+s);
@@ -1097,6 +1208,24 @@ function updateStats(){
   const bt=document.getElementById('nbt'); bt.textContent=pend; bt.style.display=pend>0?'':'none';
   const evp=Object.values(dEventos).filter(e=>e.estado!=='completado').length;
   const be=document.getElementById('nbev'); be.textContent=evp; be.style.display=evp>0?'':'none';
+  renderAlertas();
+}
+
+function renderAlertas(){
+  const el=document.getElementById('inicioAlertas');
+  if(!el) return;
+  const alertas=[];
+  const today=new Date().toISOString().split('T')[0];
+  // Tareas vencidas
+  const vencidas=Object.values(dTareas).filter(t=>!t.done&&t.fecha&&t.fecha<today);
+  if(vencidas.length) alertas.push({ico:'⚠️',txt:`<strong>${vencidas.length} tarea${vencidas.length>1?'s':''} vencida${vencidas.length>1?'s':''}</strong>Revisa las tareas pendientes`,sec:'tareas'});
+  // Próximo control médico
+  const controles=Object.values(dMedico).filter(m=>m.tipo==='control'&&m.fecha>=today).sort((a,b)=>a.fecha>b.fecha?1:-1);
+  if(controles.length) alertas.push({ico:'🩺',txt:`<strong>Próximo control: ${fFecha(controles[0].fecha)}</strong>${controles[0].medico?controles[0].medico:'Control prenatal'}`,sec:'medico'});
+  // Hito próximo
+  const nextHito=Object.values(dHitos).filter(h=>h.status==='next')[0];
+  if(nextHito) alertas.push({ico:'🌟',txt:`<strong>Próximo hito: ${nextHito.nombre}</strong>${nextHito.semana?'Semana '+nextHito.semana:''}`,sec:'hitos'});
+  el.innerHTML=alertas.map(a=>`<div class="inicio-alerta" onclick="navTo('${a.sec}')"><span class="inicio-alerta-ico">${a.ico}</span><div class="inicio-alerta-txt">${a.txt}</div><span style="color:var(--rose-d);font-size:12px;">→</span></div>`).join('');
 }
 
 // ══════ EVENTOS ══════════════════════════════════════════════
@@ -1664,6 +1793,13 @@ function renderAlbumsGrid(){
   vista.innerHTML = html;
 }
 
+function nombreFotoBonita(f){
+  if(f?.caption) return f.caption;
+  if(f?.titulo) return f.titulo;
+  const fecha = f?.fecha ? fCorta(f.fecha) : '';
+  return fecha ? `Foto · ${fecha}` : 'Foto sin título';
+}
+
 function abrirAlbum(id){
   albumActual = id;
   const alb = dAlbumes[id]; if(!alb) return;
@@ -1691,10 +1827,10 @@ function abrirAlbum(id){
       <div class="inner-gall">
         ${fotos.length===0?'<div class="empty"><div class="empty-icon">📷</div><h4>Sin fotos aún</h4><p>Agrega fotos a este álbum.</p></div>':
         fotos.map(([fid,f])=>`<div class="fcard" onclick="abrirLightbox('${esc(f.url)}')">
-          <img src="${esc(f.url)}" alt="${esc(f.name)}" loading="lazy">
+          <img src="${esc(f.url)}" alt="" loading="lazy">
           ${puedeEditar?`<button class="fcard-del" onclick="event.stopPropagation();eliminarFoto('${fid}','${esc(f.url)}')">×</button>`:''}
           <div class="fcard-info">
-            <div class="fcard-name" onclick="editarCaption('${fid}',this)" title="Clic para editar">${esc(f.caption||f.name||'')}</div>
+            <div class="fcard-name" onclick="editarCaption('${fid}',this)" title="Clic para editar">${esc(f.caption||nombreFotoBonita(f))}</div>
             <div class="fcard-date">${fCorta(f.fecha)}${f.autor?' · '+esc(f.autor):''}</div>
           </div>
         </div>`).join('')}
@@ -1782,10 +1918,11 @@ window.subirFotosAlbum=async function(files,albumId){
     if(!file.type.startsWith('image/')) continue;
     try{
       const key=push(ref(db,'galeria')).key;
-      const sr=sref(storage,'galeria/'+key+'_'+file.name);
+      const ext = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g,'');
+      const sr=sref(storage,'galeria/'+key+(ext?'.'+ext:''));
       const snap=await uploadBytes(sr,file);
       const url=await getDownloadURL(snap.ref);
-      await set(ref(db,'galeria/'+key),{url,name:file.name,fecha:new Date().toISOString(),autor:CU?.nombre||'',albumId:albumId});
+      await set(ref(db,'galeria/'+key),{url,caption:'',fecha:new Date().toISOString(),autor:CU?.nombre||'',albumId:albumId});
     }catch(e){ toast('Error: '+e.message); }
   }
   toast('Fotos guardadas ✓');
@@ -1858,40 +1995,145 @@ function renderDashNota(){
 
 window.eliminarNota=async function(id){ if(confirm('¿Eliminar?')) await remove(ref(db,'notas/'+id)); };
 
-// ══════ LISTA ═════════════════════════════════════════════════
+// ══════ LISTA RICA ════════════════════════════════════════════
+const LISTA_CAT_MAP = {ropa:'👗 Ropa',cuna:'🛏 Dormir',alim:'🍼 Alimentación',bano:'🛁 Baño',trans:'🚗 Transporte',salud:'💊 Salud',otro:'📦 Otro'};
+let listaFiltroActual = 'todo';
+let listaEditing = null;
+const ESTADO_LISTA_MAP = {pendiente:'Pendiente',cotizando:'Cotizando',reservado:'Reservado / encargado',comprado:'Comprado',regalado:'Regalado'};
+function estadoListaLabel(v){ return ESTADO_LISTA_MAP[v] || v || 'Pendiente'; }
+
 async function sembrarLista(){
   for(const [catId,cat] of Object.entries(LISTA_CATS)){
     for(const nombre of cat.items){
-      await push(ref(db,'lista'),{nombre,cat:catId,done:false,creadoEn:new Date().toISOString()});
+      await push(ref(db,'lista'),{nombre,cat:catId,done:false,prio:'media',creadoEn:new Date().toISOString()});
     }
   }
 }
 
 function renderLista(){
-  const g=document.getElementById('listaGrid');
-  const cats={};
-  Object.entries(dLista).forEach(([id,item])=>{ const c=item.cat||'otro'; if(!cats[c]) cats[c]=[]; cats[c].push({...item,id}); });
-  g.innerHTML=Object.entries(LISTA_CATS).map(([catId,catDef])=>{
-    const items=(cats[catId]||[]).sort((a,b)=>(a.done?1:-1)-(b.done?1:-1));
-    const done=items.filter(i=>i.done).length;
-    return `<div class="lcat">
-      <div class="lcat-hdr"><span>${catDef.icon}</span><span class="lcat-title">${catDef.titulo}</span><span class="lcat-cnt">${done}/${items.length}</span></div>
-      <div class="litems">${items.map(item=>`<div class="litem">
-        <div class="lcb ${item.done?'done':''}" onclick="toggleL('${item.id}')"></div>
-        <span class="ltxt ${item.done?'done':''}">${esc(item.nombre)}</span>
-        <button class="ldel" onclick="eliminarL('${item.id}')">×</button>
-      </div>`).join('')}</div>
-      <div class="ladd">
-        <input class="ladd-inp" type="text" placeholder="+ Agregar…" onkeydown="if(event.key==='Enter')agregarL(this,'${catId}')">
-        <button class="btn btn-outline btn-sm" onclick="agregarL(this.previousElementSibling,'${catId}')">+</button>
+  const g = document.getElementById('listaRich');
+  const res = document.getElementById('listaResumen');
+  if(!g) return;
+  let items = Object.entries(dLista).map(([id,i])=>({...i,id}));
+  // Resumen
+  const total=items.length, comprado=items.filter(i=>i.done).length;
+  const totalPrecio=items.filter(i=>i.precio).reduce((s,i)=>s+parseFloat(i.precio||0),0);
+  const compradoPrecio=items.filter(i=>i.done&&i.precio).reduce((s,i)=>s+parseFloat(i.precio||0),0);
+  if(res) res.innerHTML=`
+    <div class="lista-resumen-stat"><div class="n">${comprado}/${total}</div><div class="l">Comprados</div></div>
+    <div class="lista-resumen-stat"><div class="n">${Math.round(comprado/Math.max(total,1)*100)}%</div><div class="l">Progreso</div></div>
+    ${totalPrecio>0?`<div class="lista-resumen-stat"><div class="n">$${Math.round(compradoPrecio/1000)}k</div><div class="l">Gastado</div></div>
+    <div class="lista-resumen-stat"><div class="n">$${Math.round(totalPrecio/1000)}k</div><div class="l">Total estimado</div></div>`:''}
+  `;
+  // Filtrar
+  if(listaFiltroActual==='pendiente') items=items.filter(i=>!i.done);
+  else if(listaFiltroActual==='comprado') items=items.filter(i=>i.done);
+  else if(listaFiltroActual!=='todo') items=items.filter(i=>i.cat===listaFiltroActual);
+  // Ordenar: pendientes primero, luego por prioridad
+  const prioOrd={alta:0,media:1,baja:2};
+  items.sort((a,b)=>{
+    if(a.done!==b.done) return a.done?1:-1;
+    return (prioOrd[a.prio||'media'])-(prioOrd[b.prio||'media']);
+  });
+  if(!items.length){ g.innerHTML='<div class="empty"><div class="empty-icon">🛍</div><h4>Sin ítems aquí</h4><p>Agrega el primero con el botón de arriba.</p></div>'; return; }
+  g.innerHTML = items.map(item=>{
+    const catLbl = LISTA_CAT_MAP[item.cat||'otro']||'📦 Otro';
+    return `<div class="lista-rich-item ${item.done?'comprado':''}">
+      <div class="lri-top">
+        <div class="lri-cb ${item.done?'done':''}" onclick="toggleLRich('${item.id}')"></div>
+        <div class="lri-body">
+          <div class="lri-nombre ${item.done?'done':''}">${esc(item.nombre)}</div>
+          ${item.nota?`<div class="lri-nota">${esc(item.nota)}</div>`:''}
+          <div class="lri-meta">
+            <span class="lri-cat">${catLbl}</span>
+            <span class="lri-prio lri-prio-${item.prio||'media'}">${item.prio==='alta'?'🔴 Alta':item.prio==='baja'?'🟢 Baja':'🟡 Media'}</span>
+            ${item.cantidad?`<span style="font-size:11px;color:var(--dim);">🔢 ${esc(item.cantidad)}</span>`:''}
+            ${item.estado?`<span style="font-size:11px;color:var(--dim);">📌 ${esc(estadoListaLabel(item.estado))}</span>`:''}
+            ${item.precio?`<span class="lri-precio">$${parseInt(item.precio).toLocaleString('es-CL')}</span>`:''}
+            ${item.tienda?`<span style="font-size:11px;color:var(--dim);">📍 ${esc(item.tienda)}</span>`:''}
+            ${item.link?`<a class="lri-link" href="${esc(item.link)}" target="_blank">🔗 Ver producto</a>`:''}
+            ${item.adjUrl?`<a class="lri-link" href="${esc(item.adjUrl)}" target="_blank">📎 ${esc(item.adjName||'Adjunto')}</a>`:''}
+          </div>
+        </div>
+        <div class="lri-acts">
+          <button class="btn btn-ghost btn-sm" onclick="abrirModalListaItem('${item.id}')">✏️</button>
+          <button class="btn btn-ghost btn-sm" onclick="eliminarLRich('${item.id}')" style="color:#c04040;">✕</button>
+        </div>
       </div>
     </div>`;
   }).join('');
 }
 
-window.toggleL=async function(id){ const i=dLista[id]; if(!i) return; await update(ref(db,'lista/'+id),{done:!i.done}); };
-window.eliminarL=async function(id){ await remove(ref(db,'lista/'+id)); };
-window.agregarL=async function(inp,catId){ const n=inp.value.trim(); if(!n) return; await push(ref(db,'lista'),{nombre:n,cat:catId,done:false,creadoEn:new Date().toISOString()}); inp.value=''; };
+window.filtrarLista = function(f, el){
+  listaFiltroActual=f;
+  document.querySelectorAll('#listaFiltros .fpill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active'); renderLista();
+};
+
+window.toggleLRich = async function(id){
+  const i=dLista[id]; if(!i) return;
+  await update(ref(db,'lista/'+id),{done:!i.done});
+};
+window.eliminarLRich = async function(id){ if(confirm('¿Eliminar?')) await remove(ref(db,'lista/'+id)); };
+
+window.abrirModalListaItem = function(id){
+  listaEditing=id||null;
+  document.getElementById('mListaTitle').textContent=id?'Editar ítem':'Nuevo ítem';
+  if(id&&dLista[id]){
+    const i=dLista[id];
+    document.getElementById('liNombre').value=i.nombre||'';
+    document.getElementById('liNota').value=i.nota||'';
+    document.getElementById('liCantidad').value=i.cantidad||'';
+    document.getElementById('liEstado').value=i.estado||'pendiente';
+    document.getElementById('liCat').value=i.cat||'otro';
+    document.getElementById('liPrio').value=i.prio||'media';
+    document.getElementById('liPrecio').value=i.precio||'';
+    document.getElementById('liTienda').value=i.tienda||'';
+    document.getElementById('liLink').value=i.link||'';
+    document.getElementById('liAdj').value='';
+    document.getElementById('liAdjActual').innerHTML=i.adjUrl?`Adjunto actual: <a href="${esc(i.adjUrl)}" target="_blank">${esc(i.adjName||'Abrir adjunto')}</a>`:'Sin adjunto guardado';
+  } else {
+    document.getElementById('liNombre').value=''; document.getElementById('liNota').value='';
+    document.getElementById('liCantidad').value=''; document.getElementById('liEstado').value='pendiente';
+    document.getElementById('liCat').value='otro'; document.getElementById('liPrio').value='media';
+    document.getElementById('liPrecio').value=''; document.getElementById('liTienda').value='';
+    document.getElementById('liLink').value=''; document.getElementById('liAdj').value=''; document.getElementById('liAdjActual').textContent='Puedes adjuntar una imagen, PDF o documento de referencia.';
+  }
+  document.getElementById('mListaItem').classList.add('on');
+  setTimeout(()=>document.getElementById('liNombre').focus(),80);
+};
+window.cerrarModalListaItem = ()=>document.getElementById('mListaItem').classList.remove('on');
+
+window.guardarListaItem = async function(){
+  const nombre=document.getElementById('liNombre').value.trim();
+  if(!nombre){ toast('Escribe el nombre del ítem'); return; }
+  const existing = listaEditing ? (dLista[listaEditing]||{}) : {};
+  const data={
+    nombre, nota:document.getElementById('liNota').value.trim(),
+    cantidad:document.getElementById('liCantidad').value.trim(),
+    estado:document.getElementById('liEstado').value,
+    cat:document.getElementById('liCat').value,
+    prio:document.getElementById('liPrio').value,
+    precio:document.getElementById('liPrecio').value,
+    tienda:document.getElementById('liTienda').value.trim(),
+    link:document.getElementById('liLink').value.trim(),
+    adjUrl:existing.adjUrl||'', adjName:existing.adjName||'',
+    done:listaEditing?(existing.done||false):false,
+    creadoEn:listaEditing?(existing.creadoEn||new Date().toISOString()):new Date().toISOString(),
+  };
+  const file = document.getElementById('liAdj').files?.[0];
+  const r=listaEditing?ref(db,'lista/'+listaEditing):push(ref(db,'lista'));
+  const key = listaEditing || r.key;
+  if(file){
+    const cleanName = file.name.replace(/[<>]/g,'').slice(0,80);
+    const ext = (file.name.split('.').pop() || 'bin').toLowerCase().replace(/[^a-z0-9]/g,'');
+    const sr=sref(storage,'lista/'+key+(ext?'.'+ext:''));
+    const snap=await uploadBytes(sr,file);
+    data.adjUrl=await getDownloadURL(snap.ref);
+    data.adjName=cleanName;
+  }
+  await set(r,data); cerrarModalListaItem(); toast(listaEditing?'Ítem actualizado ✓':'Ítem guardado ✓');
+};
 
 // Exponer funciones globales necesarias
 window.mostrarListaEv=mostrarListaEv;
@@ -2062,20 +2304,25 @@ function renderMedTab(tab){
 }
 window.eliminarMed = async function(id){ if(confirm('¿Eliminar?')) await remove(ref(db,'medico/'+id)); };
 
-// ══════ PLAN DE PARTO ═════════════════════════════════════════
+// ══════ PLAN DE PARTO RICO ════════════════════════════════════
 const PARTO_CATS = [
-  {id:'datos',icon:'🏥',titulo:'Datos de la clínica',items:['Nombre de la clínica','Dirección','Teléfono de emergencias','Médico tratante','Matrona asignada']},
-  {id:'valija',icon:'🧳',titulo:'Valija para la clínica',items:['DNI / carnet','Carnet de embarazo','Ropa para Amelia','Ropa para Fiorella','Pañales recién nacido','Toallitas húmedas','Almohada de lactancia','Snacks para Fabián']},
-  {id:'contactos',icon:'📞',titulo:'Contactos clave',items:['Mamá de Fiorella','Mamá de Fabián','Papá de Fiorella','Médico de cabecera','Taxi o Uber guardado']},
-  {id:'deseos',icon:'💕',titulo:'Deseos del parto',items:['Música durante el parto','Quién entra a la sala','Piel con piel inmediato','Corte del cordón (Fabián)','Fotos al nacer','Lactancia inmediata']},
+  {id:'datos',icon:'🏥',titulo:'Datos de la clínica',placeholder:'Nombre, dirección, teléfono, médico, matrona…',items:['DNI / carnet de identidad','Carnet de embarazo','Seguro de salud']},
+  {id:'valija',icon:'🧳',titulo:'Valija para la clínica',placeholder:'Lista de lo que llevarán al hospital…',items:['Ropa para Amelia (body, gorrito, manoplas)','Ropa para Fiorella','Pañales recién nacido','Toallitas húmedas','Almohada de lactancia','Snacks para Fabián','Cargadores de celular']},
+  {id:'contactos',icon:'📞',titulo:'Contactos clave',placeholder:'Anota los teléfonos de emergencia y de quién avisar primero…',items:['Mamá de Fiorella','Mamá de Fabián','Médico de cabecera','Taxi o Uber guardado']},
+  {id:'deseos',icon:'💕',titulo:'Deseos del parto',placeholder:'¿Qué es importante para ustedes durante el parto? Música, luz, quién acompaña, posición, etc…',items:['Piel con piel inmediato','Corte del cordón (Fabián)','Fotos al nacer','Lactancia inmediata']},
+  {id:'postparto',icon:'🌸',titulo:'Post parto',placeholder:'Planes para los primeros días en casa: apoyo familiar, visitas, lactancia…',items:['Preparar habitación de Amelia','Instalar silla de auto antes del parto','Revisar seguro médico de Amelia']},
 ];
 
 async function sembrarParto(){
   const updates={};
   PARTO_CATS.forEach(cat=>{
+    // texto libre vacío
+    const keyT=push(ref(db,'parto')).key;
+    updates[keyT]={tipo:'texto',cat:cat.id,texto:''};
+    // checklist items
     cat.items.forEach(nombre=>{
       const key=push(ref(db,'parto')).key;
-      updates[key]={nombre,cat:cat.id,done:false};
+      updates[key]={tipo:'check',nombre,cat:cat.id,done:false};
     });
   });
   await update(ref(db,'parto'),updates);
@@ -2084,30 +2331,69 @@ async function sembrarParto(){
 function renderParto(){
   const g = document.getElementById('partoGrid');
   if(!g) return;
-  const cats={};
-  Object.entries(dParto).forEach(([id,item])=>{ const c=item.cat||'datos'; if(!cats[c]) cats[c]=[]; cats[c].push({...item,id}); });
+  const bycat={};
+  Object.entries(dParto).forEach(([id,item])=>{ const c=item.cat||'datos'; if(!bycat[c]) bycat[c]=[]; bycat[c].push({...item,id}); });
+
   g.innerHTML = PARTO_CATS.map(cat=>{
-    const items=(cats[cat.id]||[]).sort((a,b)=>(a.done?1:-1)-(b.done?1:-1));
-    const done=items.filter(i=>i.done).length;
-    return `<div class="lcat">
-      <div class="lcat-hdr"><span>${cat.icon}</span><span class="lcat-title">${cat.titulo}</span><span class="lcat-cnt">${done}/${items.length}</span></div>
-      <div class="litems">${items.map(item=>`
-        <div class="litem">
-          <div class="lcb ${item.done?'done':''}" onclick="toggleParto('${item.id}')"></div>
-          <span class="ltxt ${item.done?'done':''}">${esc(item.nombre)}</span>
-          <button class="ldel" onclick="eliminarParto('${item.id}')">×</button>
-        </div>`).join('')}
+    const items=(bycat[cat.id]||[]);
+    const textoItem=items.find(i=>i.tipo==='texto');
+    const checks=items.filter(i=>i.tipo==='check').sort((a,b)=>(a.done?1:-1)-(b.done?1:-1));
+    const adjuntos=items.filter(i=>i.tipo==='adjunto').sort((a,b)=>b.fecha>a.fecha?1:-1);
+    const done=checks.filter(i=>i.done).length;
+    return `<div class="parto-card">
+      <div class="parto-card-hdr">
+        <span class="parto-card-ico">${cat.icon}</span>
+        <span class="parto-card-title">${cat.titulo}</span>
+        <span class="parto-card-prog">${done}/${checks.length} listo</span>
       </div>
-      <div class="ladd">
-        <input class="ladd-inp" type="text" placeholder="+ Agregar…" onkeydown="if(event.key==='Enter')agregarParto(this,'${cat.id}')">
-        <button class="btn btn-outline btn-sm" onclick="agregarParto(this.previousElementSibling,'${cat.id}')">+</button>
+      <div class="parto-card-body">
+        <textarea class="parto-richtext" placeholder="${cat.placeholder}"
+          onblur="guardarPartoTexto('${textoItem?.id||''}','${cat.id}',this.value)"
+        >${esc(textoItem?.texto||'')}</textarea>
+        <div style="margin-bottom:8px;">
+          ${checks.map(item=>`<div class="parto-check-item">
+            <div class="lcb ${item.done?'done':''}" onclick="toggleParto('${item.id}')" style="width:18px;height:18px;border-radius:4px;"></div>
+            <span style="flex:1;font-size:13px;color:var(--ink);${item.done?'text-decoration:line-through;color:var(--dim)':''}">${esc(item.nombre)}</span>
+            <button class="btn btn-ghost btn-sm" onclick="eliminarParto('${item.id}')" style="color:#c04040;opacity:0.5;">✕</button>
+          </div>`).join('')}
+        </div>
+        ${adjuntos.length?`<div style="margin:8px 0 10px;display:flex;gap:6px;flex-wrap:wrap;">${adjuntos.map(a=>`<span style="font-size:11px;background:var(--bg2);border:1px solid var(--bdr);border-radius:100px;padding:4px 8px;display:inline-flex;gap:5px;align-items:center;"><a href="${esc(a.url)}" target="_blank" style="color:var(--rose-d);text-decoration:none;">📎 ${esc(a.nombre||'Adjunto')}</a><button onclick="eliminarParto('${a.id}')" style="border:none;background:none;color:#c04040;cursor:pointer;">×</button></span>`).join('')}</div>`:''}
+        <div style="display:flex;gap:6px;margin-bottom:8px;">
+          <input class="ladd-inp" type="text" placeholder="+ Agregar ítem al checklist…" id="parto_inp_${cat.id}" onkeydown="if(event.key==='Enter')agregarParto(this,'${cat.id}')">
+          <button class="btn btn-outline btn-sm" onclick="agregarParto(document.getElementById('parto_inp_${cat.id}'),'${cat.id}')">+</button>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <input type="file" id="parto_file_${cat.id}" style="flex:1;font-size:12px;" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx">
+          <button class="btn btn-outline btn-sm" onclick="subirAdjuntoParto('${cat.id}')">Adjuntar</button>
+        </div>
       </div>
     </div>`;
   }).join('');
 }
+
+window.guardarPartoTexto = async function(existingId, cat, texto){
+  if(existingId){
+    await update(ref(db,'parto/'+existingId),{texto});
+  } else {
+    await push(ref(db,'parto'),{tipo:'texto',cat,texto});
+  }
+};
 window.toggleParto=async function(id){ const i=dParto[id]; if(!i) return; await update(ref(db,'parto/'+id),{done:!i.done}); };
 window.eliminarParto=async function(id){ await remove(ref(db,'parto/'+id)); };
-window.agregarParto=async function(inp,cat){ const n=inp.value.trim(); if(!n) return; await push(ref(db,'parto'),{nombre:n,cat,done:false}); inp.value=''; };
+window.agregarParto=async function(inp,cat){ const n=inp.value.trim(); if(!n) return; await push(ref(db,'parto'),{tipo:'check',nombre:n,cat,done:false}); inp.value=''; };
+window.subirAdjuntoParto=async function(cat){
+  const inp=document.getElementById('parto_file_'+cat);
+  const file=inp?.files?.[0];
+  if(!file){ toast('Selecciona un archivo'); return; }
+  const key=push(ref(db,'parto')).key;
+  const cleanName=file.name.replace(/[<>]/g,'').slice(0,80);
+  const ext=(file.name.split('.').pop()||'bin').toLowerCase().replace(/[^a-z0-9]/g,'');
+  const sr=sref(storage,'parto/'+key+(ext?'.'+ext:''));
+  const snap=await uploadBytes(sr,file);
+  const url=await getDownloadURL(snap.ref);
+  await set(ref(db,'parto/'+key),{tipo:'adjunto',cat,nombre:cleanName,url,fecha:new Date().toISOString()});
+  inp.value=''; toast('Adjunto guardado ✓');
+};
 
 // ══════ POLAROID CSS EXTRA (inyectado dinámicamente) ══════════
 (function(){
