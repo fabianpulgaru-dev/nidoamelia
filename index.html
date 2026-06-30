@@ -356,6 +356,7 @@ h1,h2,h3,h4{font-family:'Fraunces',serif;font-weight:300;}
         <div class="ni" onclick="navTo('galeria')"><span class="ni-icon">📷</span>Galería</div>
         <div class="ni" onclick="navTo('notas')"><span class="ni-icon">📓</span>Notas</div>
         <div class="ni" onclick="navTo('lista')"><span class="ni-icon">🛍</span>Lista de compras</div>
+        <div class="ni" onclick="navTo('acceso')" id="niAcceso" style="display:none"><span class="ni-icon">👥</span>Acceso</div>
       </nav>
       <div class="sfooter">
         <div class="wpill">
@@ -491,6 +492,25 @@ h1,h2,h3,h4{font-family:'Fraunces',serif;font-weight:300;}
               <div class="frow"><label>Nota</label><textarea id="notaTxt" placeholder="¿Qué quieres recordar de hoy?" style="min-height:90px;"></textarea></div>
               <button class="btn btn-rose" style="width:100%" onclick="guardarNota(null)">Guardar nota</button>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACCESO -->
+      <div class="sec" id="sec-acceso">
+        <div class="sec-hd"><h2>Acceso a la app</h2><p>Administra quién puede entrar al Nido de Amelia.</p></div>
+        <div style="max-width:500px;">
+          <div style="background:var(--w);border:1px solid var(--bdr);border-radius:12px;overflow:hidden;margin-bottom:16px;">
+            <div style="padding:14px 16px;border-bottom:1px solid var(--bdr);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--dim);font-weight:500;">Usuarios autorizados</div>
+            <div id="usuariosList" style="padding:4px 0;"></div>
+            <div style="padding:12px 16px;border-top:1px solid var(--bdr);display:flex;gap:8px;">
+              <input type="email" id="invEmail" placeholder="correo@gmail.com" style="flex:1;padding:8px 11px;border:1px solid var(--bdr);border-radius:var(--r);font-size:13px;background:var(--bg);color:var(--ink);">
+              <input type="text" id="invNombre" placeholder="Nombre" style="width:110px;padding:8px 11px;border:1px solid var(--bdr);border-radius:var(--r);font-size:13px;background:var(--bg);color:var(--ink);">
+              <button class="btn btn-rose btn-sm" onclick="agregarInvitado()">+ Agregar</button>
+            </div>
+          </div>
+          <div style="background:var(--sand-l);border:1px solid var(--sand-m);border-radius:10px;padding:12px 14px;font-size:12px;color:var(--sand-d);line-height:1.7;">
+            ⚠️ Solo tú (Fabián) puedes administrar el acceso. La persona invitada podrá ver y editar todo el contenido de la app.
           </div>
         </div>
       </div>
@@ -632,10 +652,23 @@ const FB = {
   appId:"1:685788518843:web:8a3120d32d7f486643cc9e"
 };
 
-const USUARIOS = {
-  'fabianpulgaru@gmail.com':     { nombre:'Fabián',   av:'av-f', inicial:'Fa' },
-  'fiorellalealespinoza@gmail.com':{ nombre:'Fiorella', av:'av-fi', inicial:'Fi' },
+// Usuarios base siempre autorizados
+const USUARIOS_BASE = {
+  'fabianpulgaru@gmail.com':     { nombre:'Fabián',   av:'av-f', inicial:'Fa', admin:true },
+  'fiorellalealespinoza@gmail.com':{ nombre:'Fiorella', av:'av-fi', inicial:'Fi', admin:false },
 };
+
+// Usuarios dinámicos cargados desde Firebase
+let dUsuarios = {};
+
+function getUsuarioInfo(email){
+  const e = email?.toLowerCase();
+  if(USUARIOS_BASE[e]) return USUARIOS_BASE[e];
+  if(dUsuarios[e]) return { nombre:dUsuarios[e].nombre||e.split('@')[0], av:'av-f', inicial:(dUsuarios[e].nombre||'?')[0].toUpperCase(), admin:false };
+  return null;
+}
+
+function esAdmin(){ return CU && (USUARIOS_BASE[CU.email]?.admin || false); }
 
 const FECHA_PARTO = new Date('2026-11-02T00:00:00');
 const FUM = new Date('2026-01-29T00:00:00');
@@ -696,16 +729,21 @@ document.getElementById('btnGoogle').addEventListener('click',async()=>{
 });
 document.getElementById('btnLogout').addEventListener('click',()=>signOut(auth));
 
-onAuthStateChanged(auth, user => {
+onAuthStateChanged(auth, async user => {
   if(user){
-    const info = USUARIOS[user.email?.toLowerCase()];
-    if(!info){ signOut(auth); document.getElementById('lerr').textContent='Correo no autorizado: '+user.email; return; }
+    // Cargar usuarios dinámicos primero
+    const snapU = await get(ref(db,'acceso'));
+    dUsuarios = snapU.val() || {};
+    const info = getUsuarioInfo(user.email);
+    if(!info){ signOut(auth); document.getElementById('lerr').textContent='Correo no autorizado: '+user.email+'. Pídele a Fabián que te invite.'; return; }
     CU = { uid:user.uid, email:user.email.toLowerCase(), ...info };
     document.getElementById('loginScreen').classList.add('out');
     document.getElementById('app').classList.add('on');
     const chip=document.getElementById('uchip'); chip.style.display='flex';
     const av=document.getElementById('uav'); av.className='uav '+CU.av; av.textContent=CU.inicial;
     document.getElementById('uname').textContent=CU.nombre;
+    // Mostrar sección acceso solo a admin
+    if(esAdmin()) document.getElementById('niAcceso').style.display='';
     initListeners();
     updateCountdown();
     setInterval(updateCountdown,60000);
@@ -747,7 +785,7 @@ window.navTo = function(sec){
   document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
   document.querySelectorAll('.mnbtn').forEach(b=>b.classList.remove('active'));
   document.getElementById('sec-'+sec).classList.add('active');
-  const map=['inicio','eventos','tareas','hitos','galeria','notas','lista'];
+  const map=['inicio','eventos','tareas','hitos','galeria','notas','lista','acceso'];
   const idx=map.indexOf(sec);
   if(idx>=0) document.querySelectorAll('.ni')[idx].classList.add('active');
   const mb=document.getElementById('mn-'+sec); if(mb) mb.classList.add('active');
@@ -763,7 +801,50 @@ function initListeners(){
   onValue(ref(db,'galeria'),s=>{ dGaleria=s.val()||{}; renderGaleria(); updateStats(); });
   onValue(ref(db,'lista'),s=>{ dLista=s.val()||{}; renderLista(); if(!s.val()) sembrarLista(); });
   onValue(ref(db,'eventos'),s=>{ dEventos=s.val()||{}; renderEvsGrid(); renderDashEv(); updateStats(); });
+  onValue(ref(db,'acceso'),s=>{ dUsuarios=s.val()||{}; if(esAdmin()) renderUsuariosList(); });
 }
+
+// ══════ ACCESO ════════════════════════════════════════════════
+function renderUsuariosList(){
+  const list = document.getElementById('usuariosList');
+  if(!list) return;
+  // Usuarios base
+  const base = Object.entries(USUARIOS_BASE).map(([email,info])=>({email,nombre:info.nombre,base:true,admin:info.admin}));
+  // Usuarios dinámicos
+  const dinamicos = Object.entries(dUsuarios).map(([key,u])=>({email:u.email,nombre:u.nombre,key,base:false,admin:false}));
+  const todos = [...base,...dinamicos];
+  list.innerHTML = todos.map(u=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--bg2);">
+      <div class="uav ${u.email===CU?.email?CU.av:'av-f'}" style="width:32px;height:32px;font-size:13px;">${u.nombre[0].toUpperCase()}</div>
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:500;color:var(--ink);">${esc(u.nombre)} ${u.admin?'<span style="font-size:10px;background:var(--rose-l);color:var(--rose-d);padding:1px 6px;border-radius:100px;">admin</span>':''}</div>
+        <div style="font-size:11px;color:var(--dim);">${esc(u.email)}</div>
+      </div>
+      ${!u.base&&esAdmin()?`<button class="btn btn-ghost btn-sm" onclick="quitarInvitado('${u.key}')" style="color:#c04040;">Quitar</button>`:''}
+    </div>
+  `).join('');
+}
+
+window.agregarInvitado = async function(){
+  if(!esAdmin()){ toast('Solo Fabián puede agregar usuarios'); return; }
+  const email = document.getElementById('invEmail').value.trim().toLowerCase();
+  const nombre = document.getElementById('invNombre').value.trim();
+  if(!email||!nombre){ toast('Escribe el correo y el nombre'); return; }
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ toast('Correo inválido'); return; }
+  if(USUARIOS_BASE[email]){ toast('Ese correo ya tiene acceso'); return; }
+  if(Object.values(dUsuarios).find(u=>u.email===email)){ toast('Ese correo ya fue invitado'); return; }
+  await push(ref(db,'acceso'),{email,nombre,agregadoPor:CU.email,fecha:new Date().toISOString()});
+  document.getElementById('invEmail').value='';
+  document.getElementById('invNombre').value='';
+  toast('✓ '+nombre+' puede entrar ahora');
+};
+
+window.quitarInvitado = async function(key){
+  if(!esAdmin()){ toast('Solo Fabián puede quitar usuarios'); return; }
+  if(!confirm('¿Quitar el acceso a este usuario?')) return;
+  await remove(ref(db,'acceso/'+key));
+  toast('Acceso eliminado');
+};
 
 function updateStats(){
   const ta=Object.values(dTareas);
