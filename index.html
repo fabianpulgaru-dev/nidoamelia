@@ -423,6 +423,7 @@ h1,h2,h3,h4{font-family:'Fraunces',serif;font-weight:300;}
     </button>
     <p class="lerr" id="lerr"></p>
     <p class="lnote">Mundo de Fabi y Fio ♡</p>
+    <p class="lnote" style="margin-top:8px;color:rgba(255,255,255,.32);line-height:1.5;">Si vienes desde WhatsApp, abre el link en Safari o Chrome antes de ingresar.</p>
   </div>
 </div>
 
@@ -963,7 +964,10 @@ function getUsuarioInfo(email){
   return null;
 }
 
-function esAdmin(){ return CU && (USUARIOS_BASE[CU.email]?.admin || false); }
+function esAdmin(){
+  const e = (CU?.email||'').toLowerCase().trim();
+  return !!(e && USUARIOS_BASE[e]?.admin);
+}
 
 const FECHA_PARTO = new Date('2026-11-02T00:00:00');
 const FUM = new Date('2026-01-29T00:00:00');
@@ -1018,10 +1022,20 @@ const fLarga2 = s => { if(!s)return''; const[y,m,d]=s.split('-'); const ms=['ene
 function toast(msg){ const t=document.getElementById('toast'),m=document.getElementById('toastMsg'); m.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2800); }
 
 // ── AUTH ─────────────────────────────────────────────────────
+function mensajeAuthError(e){
+  const msg = (e?.message || '').toLowerCase();
+  const ua = navigator.userAgent || '';
+  const pareceNavegadorInterno = /whatsapp|fbav|fban|instagram|messenger/i.test(ua);
+  if(pareceNavegadorInterno || msg.includes('missing initial state') || msg.includes('sessionstorage') || msg.includes('storage-partitioned')){
+    return 'El ingreso con Google no funciona bien dentro del navegador interno de WhatsApp. Abre este mismo link en Safari o Chrome y vuelve a iniciar sesión.';
+  }
+  return 'No se pudo iniciar sesión. Revisa que estés entrando con un correo autorizado y vuelve a intentar.';
+}
+
 document.getElementById('btnGoogle').addEventListener('click',async()=>{
   document.getElementById('lerr').textContent='';
   try{ await signInWithPopup(auth,provider); }
-  catch(e){ document.getElementById('lerr').textContent='Error: '+e.message; }
+  catch(e){ document.getElementById('lerr').textContent=mensajeAuthError(e); }
 });
 document.getElementById('btnLogout').addEventListener('click',()=>signOut(auth));
 
@@ -1108,15 +1122,17 @@ function initListeners(){
 // ── PERMISOS ──────────────────────────────────────────────────
 function getRol(){
   if(!CU) return 'familia';
-  if(USUARIOS_BASE[CU.email]) return USUARIOS_BASE[CU.email].admin ? 'admin' : 'editor';
-  const u = Object.values(dUsuarios||{}).find(u=>(u.email||'').toLowerCase().trim()===CU.email);
+  const e = (CU.email||'').toLowerCase().trim();
+  if(USUARIOS_BASE[e]) return USUARIOS_BASE[e].admin ? 'admin' : 'editor';
+  const u = Object.values(dUsuarios||{}).find(u=>(u.email||'').toLowerCase().trim()===e);
   return u ? (u.rol||'familia') : 'familia';
 }
 
 function getSecciones(){
   if(!CU) return [];
-  if(USUARIOS_BASE[CU.email]) return ['inicio','eventos','tareas','hitos','galeria','notas','lista','mensajes','medico','parto'];
-  const u = Object.values(dUsuarios||{}).find(u=>(u.email||'').toLowerCase().trim()===CU.email);
+  const e = (CU.email||'').toLowerCase().trim();
+  if(USUARIOS_BASE[e]) return ['inicio','eventos','tareas','hitos','galeria','notas','lista','mensajes','medico','parto'];
+  const u = Object.values(dUsuarios||{}).find(u=>(u.email||'').toLowerCase().trim()===e);
   if(!u) return [];
   if(u.rol==='editor') return ['inicio','eventos','tareas','hitos','galeria','notas','lista','mensajes','medico','parto'];
   if(u.rol==='familia') return ['inicio','hitos','galeria','mensajes'];
