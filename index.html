@@ -340,9 +340,9 @@ h1,h2,h3,h4{font-family:'Fraunces',serif;font-weight:300;}
 .rol-opt small{font-size:10px;color:var(--dim);}
 .rol-opt.selected{border-color:var(--rose);background:var(--rose-l);}
 .rol-opt.selected span,.rol-opt.selected small{color:var(--rose-d);}
-.sec-chk{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:100px;border:1px solid var(--bdr);font-size:12px;cursor:pointer;transition:all .15s;user-select:none;}
-.sec-chk input{display:none;}
-.sec-chk.on{background:var(--rose-l);border-color:var(--rose-m);color:var(--rose-d);}
+.sec-chk{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:100px;border:2px solid var(--bdr);font-size:12px;cursor:pointer;transition:all .15s;user-select:none;background:var(--w);color:var(--dim);}
+.sec-chk:hover{border-color:var(--rose-m);color:var(--rose-d);}
+.sec-chk.on{background:var(--rose-l);border-color:var(--rose-m);color:var(--rose-d);font-weight:500;}
 .rol-badge{font-size:10px;padding:2px 7px;border-radius:100px;font-weight:500;}
 .rol-editor{background:var(--sage-l);color:var(--sage-d);}
 .rol-familia{background:var(--sand-l);color:var(--sand-d);}
@@ -412,6 +412,9 @@ h1,h2,h3,h4{font-family:'Fraunces',serif;font-weight:300;}
         <div class="ni" onclick="navTo('galeria')"><span class="ni-icon">📷</span>Galería</div>
         <div class="ni" onclick="navTo('notas')"><span class="ni-icon">📓</span>Notas</div>
         <div class="ni" onclick="navTo('lista')"><span class="ni-icon">🛍</span>Lista de compras</div>
+        <div class="ni" onclick="navTo('mensajes')"><span class="ni-icon">💌</span>Cartas a Amelia</div>
+        <div class="ni" onclick="navTo('medico')"><span class="ni-icon">🩺</span>Registro médico</div>
+        <div class="ni" onclick="navTo('parto')"><span class="ni-icon">🗺️</span>Plan de parto</div>
         <div class="ni" onclick="navTo('acceso')" id="niAcceso" style="display:none"><span class="ni-icon">👥</span>Acceso</div>
       </nav>
       <div class="sfooter">
@@ -594,6 +597,64 @@ h1,h2,h3,h4{font-family:'Fraunces',serif;font-weight:300;}
         </div>
       </div>
 
+      <!-- CARTAS A AMELIA -->
+      <div class="sec" id="sec-mensajes">
+        <div class="sec-hd"><h2>Cartas a Amelia</h2><p>Palabras que guardaremos para que lea cuando crezca. ♡</p></div>
+        <div class="notas-layout">
+          <div id="mensajesList"></div>
+          <div>
+            <div class="nform">
+              <h4>💌 Escribir una carta</h4>
+              <div class="frow"><label>Para Amelia cuando tenga…</label>
+                <select id="msgEdad" style="width:100%;padding:8px 11px;border:1px solid var(--bdr);border-radius:var(--r);font-size:13px;background:var(--bg);color:var(--ink);appearance:none;">
+                  <option value="nacer">Cuando nazca</option>
+                  <option value="1">1 año</option>
+                  <option value="5">5 años</option>
+                  <option value="10">10 años</option>
+                  <option value="15">15 años</option>
+                  <option value="18">18 años</option>
+                </select>
+              </div>
+              <div class="frow"><label>Carta</label><textarea id="msgTxt" placeholder="Querida Amelia…" style="min-height:120px;"></textarea></div>
+              <button class="btn btn-rose" style="width:100%" onclick="guardarMensaje()">Guardar carta</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- REGISTRO MÉDICO -->
+      <div class="sec" id="sec-medico">
+        <div class="sec-hd"><h2>Registro médico</h2><p>Controles, peso, exámenes y medicamentos.</p></div>
+        <div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;">
+          <button class="fpill active" id="med-tab-controles" onclick="switchMedTab('controles',this)">📋 Controles</button>
+          <button class="fpill" id="med-tab-peso" onclick="switchMedTab('peso',this)">⚖️ Peso y presión</button>
+          <button class="fpill" id="med-tab-examenes" onclick="switchMedTab('examenes',this)">🧪 Exámenes</button>
+          <button class="fpill" id="med-tab-medicamentos" onclick="switchMedTab('medicamentos',this)">💊 Medicamentos</button>
+        </div>
+        <div id="med-controles">
+          <div style="display:flex;justify-content:flex-end;margin-bottom:12px;"><button class="btn btn-rose btn-sm" onclick="abrirModalMed('control')">+ Control</button></div>
+          <div id="medControlesList"></div>
+        </div>
+        <div id="med-peso" style="display:none">
+          <div style="display:flex;justify-content:flex-end;margin-bottom:12px;"><button class="btn btn-rose btn-sm" onclick="abrirModalMed('peso')">+ Registro</button></div>
+          <div id="medPesoList"></div>
+        </div>
+        <div id="med-examenes" style="display:none">
+          <div style="display:flex;justify-content:flex-end;margin-bottom:12px;"><button class="btn btn-rose btn-sm" onclick="abrirModalMed('examen')">+ Examen</button></div>
+          <div id="medExamenesList"></div>
+        </div>
+        <div id="med-medicamentos" style="display:none">
+          <div style="display:flex;justify-content:flex-end;margin-bottom:12px;"><button class="btn btn-rose btn-sm" onclick="abrirModalMed('medicamento')">+ Medicamento</button></div>
+          <div id="medMedicamentosList"></div>
+        </div>
+      </div>
+
+      <!-- PLAN DE PARTO -->
+      <div class="sec" id="sec-parto">
+        <div class="sec-hd"><h2>Plan de parto</h2><p>Todo organizado para el gran día de Amelia.</p></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;" id="partoGrid"></div>
+      </div>
+
       <!-- LISTA -->
       <div class="sec" id="sec-lista">
         <div class="sec-hd"><h2>Lista de compras</h2><p>Todo lo que Amelia va a necesitar.</p></div>
@@ -612,6 +673,9 @@ h1,h2,h3,h4{font-family:'Fraunces',serif;font-weight:300;}
       <button class="mnbtn" id="mn-galeria" onclick="navTo('galeria')"><span class="mni">📷</span>Fotos</button>
       <button class="mnbtn" id="mn-notas" onclick="navTo('notas')"><span class="mni">📓</span>Notas</button>
       <button class="mnbtn" id="mn-lista" onclick="navTo('lista')"><span class="mni">🛍</span>Lista</button>
+      <button class="mnbtn" id="mn-mensajes" onclick="navTo('mensajes')"><span class="mni">💌</span>Cartas</button>
+      <button class="mnbtn" id="mn-medico" onclick="navTo('medico')"><span class="mni">🩺</span>Médico</button>
+      <button class="mnbtn" id="mn-parto" onclick="navTo('parto')"><span class="mni">🗺️</span>Parto</button>
     </div>
   </nav>
 </div>
@@ -728,6 +792,18 @@ h1,h2,h3,h4{font-family:'Fraunces',serif;font-weight:300;}
   </div>
 </div>
 
+<!-- Modal Médico -->
+<div class="moverlay" id="mMed" onclick="if(event.target===this)cerrarModalMed()">
+  <div class="modal">
+    <h3 id="mMedTitle">Nuevo registro</h3>
+    <div id="mMedFields"></div>
+    <div class="mactions">
+      <button class="btn btn-outline" onclick="cerrarModalMed()">Cancelar</button>
+      <button class="btn btn-rose" onclick="guardarMed()">Guardar</button>
+    </div>
+  </div>
+</div>
+
 <div class="lightbox" id="lightbox" onclick="cerrarLightbox()">
   <button class="lb-close" onclick="cerrarLightbox()">×</button>
   <img id="lbImg" src="" alt="">
@@ -813,6 +889,7 @@ let icoSel = '🎀';
 let evActual = null;
 
 let dTareas={}, dHitos={}, dNotas={}, dGaleria={}, dLista={}, dEventos={};
+let dMensajes={}, dMedico={}, dParto={};
 
 // ── HELPERS ──────────────────────────────────────────────────
 const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -888,7 +965,7 @@ window.navTo = function(sec){
   document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
   document.querySelectorAll('.mnbtn').forEach(b=>b.classList.remove('active'));
   document.getElementById('sec-'+sec).classList.add('active');
-  const map=['inicio','eventos','tareas','hitos','galeria','notas','lista','acceso'];
+  const map=['inicio','eventos','tareas','hitos','galeria','notas','lista','mensajes','medico','parto','acceso'];
   const idx=map.indexOf(sec);
   if(idx>=0) document.querySelectorAll('.ni')[idx].classList.add('active');
   const mb=document.getElementById('mn-'+sec); if(mb) mb.classList.add('active');
@@ -906,6 +983,9 @@ function initListeners(){
   onValue(ref(db,'lista'),s=>{ dLista=s.val()||{}; renderLista(); if(!s.val()) sembrarLista(); });
   onValue(ref(db,'eventos'),s=>{ dEventos=s.val()||{}; renderEvsGrid(); renderDashEv(); updateStats(); });
   onValue(ref(db,'acceso'),s=>{ dUsuarios=s.val()||{}; if(esAdmin()) renderUsuariosList(); aplicarPermisos(); });
+  onValue(ref(db,'mensajes'),s=>{ dMensajes=s.val()||{}; renderMensajes(); });
+  onValue(ref(db,'medico'),s=>{ dMedico=s.val()||{}; renderMedico(); });
+  onValue(ref(db,'parto'),s=>{ dParto=s.val()||{}; renderParto(); if(!s.val()) sembrarParto(); });
 }
 
 // ── PERMISOS ──────────────────────────────────────────────────
@@ -921,8 +1001,8 @@ function getSecciones(){
   if(USUARIOS_BASE[CU.email]) return ['inicio','eventos','tareas','hitos','galeria','notas','lista'];
   const u = Object.values(dUsuarios).find(u=>u.email===CU.email);
   if(!u) return [];
-  if(u.rol==='editor') return ['inicio','eventos','tareas','hitos','galeria','notas','lista'];
-  if(u.rol==='familia') return ['inicio','hitos','galeria'];
+  if(u.rol==='editor') return ['inicio','eventos','tareas','hitos','galeria','notas','lista','mensajes','medico','parto'];
+  if(u.rol==='familia') return ['inicio','hitos','galeria','mensajes'];
   return u.secciones || ['inicio','hitos','galeria'];
 }
 
@@ -947,11 +1027,11 @@ function aplicarPermisos(){
 
 // ══════ ACCESO ════════════════════════════════════════════════
 window.selRol = function(el){
-  document.querySelectorAll('.rol-opt').forEach(o=>o.classList.remove('selected'));
+  document.querySelectorAll('#rolPicker .rol-opt').forEach(o=>o.classList.remove('selected'));
   el.classList.add('selected');
   document.getElementById('seccionesPicker').style.display = el.dataset.rol==='personalizado'?'block':'none';
 };
-window.toggleSec = function(el){ el.classList.toggle('on'); };
+window.toggleSec = function(el){ el.classList.toggle('on'); event.stopPropagation(); };
 
 function renderUsuariosList(){
   const list = document.getElementById('usuariosList');
@@ -1613,7 +1693,10 @@ function abrirAlbum(id){
         fotos.map(([fid,f])=>`<div class="fcard" onclick="abrirLightbox('${esc(f.url)}')">
           <img src="${esc(f.url)}" alt="${esc(f.name)}" loading="lazy">
           ${puedeEditar?`<button class="fcard-del" onclick="event.stopPropagation();eliminarFoto('${fid}','${esc(f.url)}')">×</button>`:''}
-          <div class="fcard-info"><div class="fcard-name">${esc(f.name)}</div><div class="fcard-date">${fCorta(f.fecha)}${f.autor?' · '+esc(f.autor):''}</div></div>
+          <div class="fcard-info">
+            <div class="fcard-name" onclick="editarCaption('${fid}',this)" title="Clic para editar">${esc(f.caption||f.name||'')}</div>
+            <div class="fcard-date">${fCorta(f.fecha)}${f.autor?' · '+esc(f.autor):''}</div>
+          </div>
         </div>`).join('')}
       </div>
     </div>`;
@@ -1813,6 +1896,238 @@ window.agregarL=async function(inp,catId){ const n=inp.value.trim(); if(!n) retu
 // Exponer funciones globales necesarias
 window.mostrarListaEv=mostrarListaEv;
 window.renderEvsGrid=renderEvsGrid;
+
+// ══════ FOTOS - CAPTION EDITABLE ══════════════════════════════
+window.editarCaption = async function(fotoId, el){
+  const val = el.textContent;
+  el.contentEditable = 'true';
+  el.focus();
+  const range = document.createRange();
+  range.selectNodeContents(el);
+  window.getSelection().removeAllRanges();
+  window.getSelection().addRange(range);
+  el.onblur = async ()=>{
+    el.contentEditable = 'false';
+    const nuevo = el.textContent.trim();
+    if(nuevo !== val) await update(ref(db,'galeria/'+fotoId),{caption:nuevo});
+  };
+  el.onkeydown = e=>{ if(e.key==='Enter'){ e.preventDefault(); el.blur(); } };
+};
+
+// ══════ CARTAS A AMELIA ═══════════════════════════════════════
+window.guardarMensaje = async function(){
+  const txt = document.getElementById('msgTxt').value.trim();
+  if(!txt){ toast('Escribe algo para Amelia'); return; }
+  await push(ref(db,'mensajes'),{
+    texto:txt,
+    edad:document.getElementById('msgEdad').value,
+    autor:CU?.nombre||'',
+    email:CU?.email||'',
+    fecha:new Date().toISOString(),
+  });
+  document.getElementById('msgTxt').value='';
+  toast('Carta guardada ✓');
+};
+
+function renderMensajes(){
+  const list = document.getElementById('mensajesList');
+  if(!list) return;
+  const items = Object.entries(dMensajes).map(([id,m])=>({...m,id})).sort((a,b)=>b.fecha>a.fecha?1:-1);
+  if(!items.length){
+    list.innerHTML='<div class="empty"><div class="empty-icon">💌</div><h4>Sin cartas aún</h4><p>Escribe la primera carta para que Amelia la lea cuando crezca.</p></div>';
+    return;
+  }
+  const edadLbl = {nacer:'Al nacer','1':'Al cumplir 1 año','5':'A los 5 años','10':'A los 10 años','15':'A los 15 años','18':'A los 18 años'};
+  list.innerHTML = items.map(m=>{
+    const info = USUARIOS_BASE[m.email]||{av:'av-f',inicial:'?',nombre:m.autor||'?'};
+    return `<div class="ncard" style="border-left:3px solid var(--rose-m);position:relative;">
+      <div style="position:absolute;top:14px;right:14px;background:var(--rose-l);color:var(--rose-d);font-size:10px;font-weight:500;padding:3px 9px;border-radius:100px;">
+        ${edadLbl[m.edad]||m.edad}
+      </div>
+      <div class="nhdr" style="margin-bottom:10px;">
+        <div class="nav-chip">
+          <div class="nav-av ${info.av}">${info.inicial[0]}</div>
+          <span class="nav-name" style="color:${info.av==='av-f'?'var(--sage-d)':'var(--rose-d)'};">${esc(info.nombre)}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:7px;">
+          <span class="ndate">${fLarga(m.fecha)}</span>
+          <button class="btn btn-ghost btn-sm" onclick="eliminarMensaje('${m.id}')" style="color:#c04040;">✕</button>
+        </div>
+      </div>
+      <div style="font-family:'Fraunces',serif;font-size:15px;color:var(--ink);line-height:1.8;font-style:italic;">${esc(m.texto)}</div>
+    </div>`;
+  }).join('');
+}
+window.eliminarMensaje = async function(id){ if(confirm('¿Eliminar esta carta?')) await remove(ref(db,'mensajes/'+id)); };
+
+// ══════ REGISTRO MÉDICO ═══════════════════════════════════════
+let medTabActual = 'controles';
+let medTipo = 'control';
+let medEditing = null;
+
+window.switchMedTab = function(tab, el){
+  medTabActual = tab;
+  document.querySelectorAll('#sec-medico .fpill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  ['controles','peso','examenes','medicamentos'].forEach(t=>{
+    document.getElementById('med-'+t).style.display = t===tab?'block':'none';
+  });
+};
+
+window.abrirModalMed = function(tipo, id){
+  medTipo = tipo; medEditing = id||null;
+  const titulos = {control:'Nuevo control prenatal',peso:'Nuevo registro de peso/presión',examen:'Nuevo examen',medicamento:'Nuevo medicamento'};
+  document.getElementById('mMedTitle').textContent = id ? 'Editar registro' : titulos[tipo];
+  const existing = id && dMedico[id] ? dMedico[id] : {};
+  const fields = {
+    control: `
+      <div class="frow"><label>Fecha</label><input type="date" id="mf-fecha" value="${existing.fecha||''}"></div>
+      <div class="frow"><label>Semana de embarazo</label><input type="number" id="mf-semana" min="1" max="40" placeholder="Ej: 27" value="${existing.semana||''}"></div>
+      <div class="frow"><label>Médico / lugar</label><input type="text" id="mf-medico" placeholder="Dra. González · Clínica X" value="${esc(existing.medico||'')}"></div>
+      <div class="frow"><label>Notas del control</label><textarea id="mf-notas" placeholder="Todo bien, latidos normales…" style="min-height:70px;">${esc(existing.notas||'')}</textarea></div>`,
+    peso: `
+      <div class="frow"><label>Fecha</label><input type="date" id="mf-fecha" value="${existing.fecha||''}"></div>
+      <div class="frow"><label>Semana</label><input type="number" id="mf-semana" min="1" max="40" value="${existing.semana||''}"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;">
+        <div class="frow"><label>Peso (kg)</label><input type="number" step="0.1" id="mf-peso" placeholder="65.5" value="${existing.peso||''}"></div>
+        <div class="frow"><label>Presión (mmHg)</label><input type="text" id="mf-presion" placeholder="120/80" value="${esc(existing.presion||'')}"></div>
+      </div>
+      <div class="frow"><label>Notas</label><input type="text" id="mf-notas" placeholder="Observaciones…" value="${esc(existing.notas||'')}"></div>`,
+    examen: `
+      <div class="frow"><label>Fecha</label><input type="date" id="mf-fecha" value="${existing.fecha||''}"></div>
+      <div class="frow"><label>Nombre del examen</label><input type="text" id="mf-nombre" placeholder="Hemograma, ecografía…" value="${esc(existing.nombre||'')}"></div>
+      <div class="frow"><label>Resultado / observación</label><textarea id="mf-notas" placeholder="Todo en rango normal…" style="min-height:70px;">${esc(existing.notas||'')}</textarea></div>`,
+    medicamento: `
+      <div class="frow"><label>Medicamento</label><input type="text" id="mf-nombre" placeholder="Ácido fólico, hierro…" value="${esc(existing.nombre||'')}"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;">
+        <div class="frow"><label>Dosis</label><input type="text" id="mf-dosis" placeholder="1 pastilla" value="${esc(existing.dosis||'')}"></div>
+        <div class="frow"><label>Frecuencia</label><input type="text" id="mf-freq" placeholder="Diario, c/8h…" value="${esc(existing.freq||'')}"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;">
+        <div class="frow"><label>Desde</label><input type="date" id="mf-desde" value="${existing.desde||''}"></div>
+        <div class="frow"><label>Hasta (opcional)</label><input type="date" id="mf-hasta" value="${existing.hasta||''}"></div>
+      </div>
+      <div class="frow"><label>Notas</label><input type="text" id="mf-notas" placeholder="Indicado por…" value="${esc(existing.notas||'')}"></div>`,
+  };
+  document.getElementById('mMedFields').innerHTML = fields[tipo]||'';
+  document.getElementById('mMed').classList.add('on');
+};
+window.cerrarModalMed = ()=>document.getElementById('mMed').classList.remove('on');
+
+window.guardarMed = async function(){
+  const g = id=>document.getElementById(id)?.value?.trim()||'';
+  const data = {tipo:medTipo, fecha:g('mf-fecha'), semana:parseInt(g('mf-semana'))||null, notas:g('mf-notas'), creadoEn:new Date().toISOString()};
+  if(medTipo==='control') Object.assign(data,{medico:g('mf-medico')});
+  if(medTipo==='peso') Object.assign(data,{peso:g('mf-peso'),presion:g('mf-presion')});
+  if(medTipo==='examen'||medTipo==='medicamento') Object.assign(data,{nombre:g('mf-nombre')});
+  if(medTipo==='medicamento') Object.assign(data,{dosis:g('mf-dosis'),freq:g('mf-freq'),desde:g('mf-desde'),hasta:g('mf-hasta')});
+  const r = medEditing ? ref(db,'medico/'+medEditing) : push(ref(db,'medico'));
+  await set(r,data);
+  cerrarModalMed(); toast('Guardado ✓');
+};
+
+function renderMedico(){
+  renderMedTab('controles');
+  renderMedTab('peso');
+  renderMedTab('examenes');
+  renderMedTab('medicamentos');
+}
+
+function renderMedTab(tab){
+  const el = document.getElementById('med'+tab.charAt(0).toUpperCase()+tab.slice(1)+'List');
+  if(!el) return;
+  const tipoMap = {controles:'control',peso:'peso',examenes:'examen',medicamentos:'medicamento'};
+  const tipo = tipoMap[tab];
+  const items = Object.entries(dMedico).filter(([,m])=>m.tipo===tipo).map(([id,m])=>({...m,id})).sort((a,b)=>b.fecha>a.fecha?1:-1);
+  if(!items.length){ el.innerHTML=`<div class="empty"><p>Sin registros aún.</p></div>`; return; }
+  el.innerHTML = items.map(m=>`
+    <div class="tcard media" style="margin-bottom:8px;">
+      <div class="tbody">
+        <div style="font-size:13px;font-weight:500;color:var(--ink);margin-bottom:3px;">
+          ${m.fecha?`📅 ${fFecha(m.fecha)}`:''}
+          ${m.semana?`<span style="font-size:11px;color:var(--dim);margin-left:6px;">Sem ${m.semana}</span>`:''}
+          ${m.nombre?` · ${esc(m.nombre)}`:''}
+          ${m.medico?` · ${esc(m.medico)}`:''}
+        </div>
+        ${m.peso?`<div style="font-size:12px;color:var(--dim)">⚖️ ${m.peso} kg ${m.presion?`· 🩺 ${m.presion} mmHg`:''}</div>`:''}
+        ${m.dosis?`<div style="font-size:12px;color:var(--dim)">${esc(m.dosis)} · ${esc(m.freq||'')} ${m.desde?`(desde ${fFecha(m.desde)})`:''}</div>`:''}
+        ${m.notas?`<div style="font-size:12px;color:var(--dim);margin-top:3px;">${esc(m.notas)}</div>`:''}
+      </div>
+      <div class="tacts">
+        <button class="btn btn-ghost btn-sm" onclick="abrirModalMed('${tipo}','${m.id}')">✏️</button>
+        <button class="btn btn-ghost btn-sm" onclick="eliminarMed('${m.id}')" style="color:#c04040;">✕</button>
+      </div>
+    </div>
+  `).join('');
+}
+window.eliminarMed = async function(id){ if(confirm('¿Eliminar?')) await remove(ref(db,'medico/'+id)); };
+
+// ══════ PLAN DE PARTO ═════════════════════════════════════════
+const PARTO_CATS = [
+  {id:'datos',icon:'🏥',titulo:'Datos de la clínica',items:['Nombre de la clínica','Dirección','Teléfono de emergencias','Médico tratante','Matrona asignada']},
+  {id:'valija',icon:'🧳',titulo:'Valija para la clínica',items:['DNI / carnet','Carnet de embarazo','Ropa para Amelia','Ropa para Fiorella','Pañales recién nacido','Toallitas húmedas','Almohada de lactancia','Snacks para Fabián']},
+  {id:'contactos',icon:'📞',titulo:'Contactos clave',items:['Mamá de Fiorella','Mamá de Fabián','Papá de Fiorella','Médico de cabecera','Taxi o Uber guardado']},
+  {id:'deseos',icon:'💕',titulo:'Deseos del parto',items:['Música durante el parto','Quién entra a la sala','Piel con piel inmediato','Corte del cordón (Fabián)','Fotos al nacer','Lactancia inmediata']},
+];
+
+async function sembrarParto(){
+  const updates={};
+  PARTO_CATS.forEach(cat=>{
+    cat.items.forEach(nombre=>{
+      const key=push(ref(db,'parto')).key;
+      updates[key]={nombre,cat:cat.id,done:false};
+    });
+  });
+  await update(ref(db,'parto'),updates);
+}
+
+function renderParto(){
+  const g = document.getElementById('partoGrid');
+  if(!g) return;
+  const cats={};
+  Object.entries(dParto).forEach(([id,item])=>{ const c=item.cat||'datos'; if(!cats[c]) cats[c]=[]; cats[c].push({...item,id}); });
+  g.innerHTML = PARTO_CATS.map(cat=>{
+    const items=(cats[cat.id]||[]).sort((a,b)=>(a.done?1:-1)-(b.done?1:-1));
+    const done=items.filter(i=>i.done).length;
+    return `<div class="lcat">
+      <div class="lcat-hdr"><span>${cat.icon}</span><span class="lcat-title">${cat.titulo}</span><span class="lcat-cnt">${done}/${items.length}</span></div>
+      <div class="litems">${items.map(item=>`
+        <div class="litem">
+          <div class="lcb ${item.done?'done':''}" onclick="toggleParto('${item.id}')"></div>
+          <span class="ltxt ${item.done?'done':''}">${esc(item.nombre)}</span>
+          <button class="ldel" onclick="eliminarParto('${item.id}')">×</button>
+        </div>`).join('')}
+      </div>
+      <div class="ladd">
+        <input class="ladd-inp" type="text" placeholder="+ Agregar…" onkeydown="if(event.key==='Enter')agregarParto(this,'${cat.id}')">
+        <button class="btn btn-outline btn-sm" onclick="agregarParto(this.previousElementSibling,'${cat.id}')">+</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+window.toggleParto=async function(id){ const i=dParto[id]; if(!i) return; await update(ref(db,'parto/'+id),{done:!i.done}); };
+window.eliminarParto=async function(id){ await remove(ref(db,'parto/'+id)); };
+window.agregarParto=async function(inp,cat){ const n=inp.value.trim(); if(!n) return; await push(ref(db,'parto'),{nombre:n,cat,done:false}); inp.value=''; };
+
+// ══════ POLAROID CSS EXTRA (inyectado dinámicamente) ══════════
+(function(){
+  const s=document.createElement('style');
+  s.textContent=`
+  .estilo-polaroid .inner-gall{display:flex;flex-wrap:wrap;gap:24px;justify-content:center;padding:20px;background:var(--bg2);border-radius:12px;}
+  .estilo-polaroid .fcard{width:180px;background:white;padding:10px 10px 40px;box-shadow:0 6px 20px rgba(0,0,0,.18),0 2px 6px rgba(0,0,0,.12);border-radius:2px;border:none;transition:transform .25s,box-shadow .25s;position:relative;}
+  .estilo-polaroid .fcard:hover{box-shadow:0 12px 32px rgba(0,0,0,.25);transform:scale(1.06) rotate(0deg)!important;}
+  .estilo-polaroid .fcard:nth-child(odd){transform:rotate(-2deg);}
+  .estilo-polaroid .fcard:nth-child(3n){transform:rotate(1.5deg);}
+  .estilo-polaroid .fcard:nth-child(4n){transform:rotate(-1deg);}
+  .estilo-polaroid .fcard img{aspect-ratio:1;width:100%;object-fit:cover;display:block;border:1px solid #eee;}
+  .estilo-polaroid .fcard-info{padding:8px 4px 0;text-align:center;}
+  .estilo-polaroid .fcard-name{font-family:'Fraunces',serif;font-size:12px;font-style:italic;color:var(--ink2);cursor:text;}
+  .estilo-polaroid .fcard-date{font-size:10px;color:var(--dim);margin-top:2px;}
+  .estilo-polaroid .fcard-del{background:rgba(36,28,24,.6);}
+  `;
+  document.head.appendChild(s);
+})();
+
 </script>
 </body>
 </html>
