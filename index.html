@@ -951,9 +951,15 @@ const USUARIOS_BASE = {
 let dUsuarios = {};
 
 function getUsuarioInfo(email){
-  const e = email?.toLowerCase();
+  const e = (email||'').toLowerCase().trim();
   if(USUARIOS_BASE[e]) return USUARIOS_BASE[e];
-  if(dUsuarios[e]) return { nombre:dUsuarios[e].nombre||e.split('@')[0], av:'av-f', inicial:(dUsuarios[e].nombre||'?')[0].toUpperCase(), admin:false };
+  // Los invitados se guardan en Firebase con IDs automáticos de push(),
+  // no con el correo como clave. Por eso hay que buscarlos por el campo email.
+  const u = Object.values(dUsuarios||{}).find(x => (x.email||'').toLowerCase().trim() === e);
+  if(u){
+    const nombre = u.nombre || e.split('@')[0];
+    return { nombre, av:'av-f', inicial:(nombre[0]||'?').toUpperCase(), admin:false };
+  }
   return null;
 }
 
@@ -1103,14 +1109,14 @@ function initListeners(){
 function getRol(){
   if(!CU) return 'familia';
   if(USUARIOS_BASE[CU.email]) return USUARIOS_BASE[CU.email].admin ? 'admin' : 'editor';
-  const u = Object.values(dUsuarios).find(u=>u.email===CU.email);
+  const u = Object.values(dUsuarios||{}).find(u=>(u.email||'').toLowerCase().trim()===CU.email);
   return u ? (u.rol||'familia') : 'familia';
 }
 
 function getSecciones(){
   if(!CU) return [];
   if(USUARIOS_BASE[CU.email]) return ['inicio','eventos','tareas','hitos','galeria','notas','lista','mensajes','medico','parto'];
-  const u = Object.values(dUsuarios).find(u=>u.email===CU.email);
+  const u = Object.values(dUsuarios||{}).find(u=>(u.email||'').toLowerCase().trim()===CU.email);
   if(!u) return [];
   if(u.rol==='editor') return ['inicio','eventos','tareas','hitos','galeria','notas','lista','mensajes','medico','parto'];
   if(u.rol==='familia') return ['inicio','hitos','galeria','mensajes'];
@@ -1172,7 +1178,7 @@ window.agregarInvitado = async function(){
   if(!email||!nombre){ toast('Escribe el correo y el nombre'); return; }
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ toast('Correo inválido'); return; }
   if(USUARIOS_BASE[email]){ toast('Ese correo ya tiene acceso'); return; }
-  if(Object.values(dUsuarios).find(u=>u.email===email)){ toast('Ese correo ya fue invitado'); return; }
+  if(Object.values(dUsuarios||{}).find(u=>(u.email||'').toLowerCase().trim()===email)){ toast('Ese correo ya fue invitado'); return; }
   const rolSel = document.querySelector('#rolPicker .rol-opt.selected')?.dataset?.rol || 'familia';
   let secciones = null;
   if(rolSel==='personalizado'){
