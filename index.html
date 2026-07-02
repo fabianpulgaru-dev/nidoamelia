@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- VERSION: v3_config_embarazo_y_notas_segmentadas_2026-07-02 -->
+<!-- VERSION: v4_inicio_familiar_ajustes_privados_2026-07-02 -->
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -424,7 +424,7 @@ h1,h2,h3,h4{font-family:'Fraunces',serif;font-weight:300;}
     </button>
     <p class="lerr" id="lerr"></p>
     <p class="lnote">Mundo de Fabi y Fio ♡</p>
-    <p class="lnote" style="margin-top:8px;color:rgba(255,255,255,.32);line-height:1.5;">Si vienes desde WhatsApp, abre el link en Safari o Chrome antes de ingresar.<br><span style="opacity:.7">Versión v3 · configuración embarazo + notas por audiencia</span></p>
+    <p class="lnote" style="margin-top:8px;color:rgba(255,255,255,.32);line-height:1.5;">Si vienes desde WhatsApp, abre el link en Safari o Chrome antes de ingresar.<br><span style="opacity:.7">Versión v4 · inicio familiar + ajustes privados</span></p>
   </div>
 </div>
 
@@ -460,6 +460,7 @@ h1,h2,h3,h4{font-family:'Fraunces',serif;font-weight:300;}
         <div class="ni" onclick="navTo('medico')"><span class="ni-icon">🩺</span>Registro médico</div>
         <div class="ni" onclick="navTo('parto')"><span class="ni-icon">🗺️</span>Plan de parto</div>
         <div class="ni" onclick="navTo('acceso')" id="niAcceso" style="display:none"><span class="ni-icon">👥</span>Acceso</div>
+        <div class="ni" onclick="navTo('ajustes')" id="niAjustes" style="display:none"><span class="ni-icon">⚙️</span>Ajustes</div>
       </nav>
       <div class="sfooter">
         <div class="wpill">
@@ -504,10 +505,10 @@ h1,h2,h3,h4{font-family:'Fraunces',serif;font-weight:300;}
               </div>
             </div>
           </div>
-          <div class="dcard">
-            <div class="dcard-title"><span>⚙️</span>Configuración del embarazo</div>
-            <div id="pregConfigMini" style="font-size:12px;color:var(--dim);line-height:1.7;margin-bottom:10px;">Cargando configuración…</div>
-            <button class="btn btn-outline btn-sm" onclick="abrirModalEmbarazo()">Editar cálculo</button>
+          <div class="dcard" style="background:linear-gradient(135deg,var(--rose-l),var(--sand-l));border-color:var(--rose-m);">
+            <div class="dcard-title"><span>💗</span>Hoy en el nido</div>
+            <div id="inicioMensajeAvance" style="font-family:'Fraunces',serif;font-size:18px;color:var(--rose-d);line-height:1.35;margin-bottom:7px;">Amelia sigue creciendo.</div>
+            <div id="inicioSubAvance" style="font-size:12px;color:var(--ink2);line-height:1.7;">Cada día falta menos para conocerte.</div>
           </div>
           <div class="dcard">
             <div class="dcard-title"><span>🎀</span>Próximos eventos</div>
@@ -658,6 +659,27 @@ h1,h2,h3,h4{font-family:'Fraunces',serif;font-weight:300;}
         </div>
       </div>
 
+      <!-- AJUSTES -->
+      <div class="sec" id="sec-ajustes">
+        <div class="sec-hd"><h2>Ajustes</h2><p>Configuración privada de la plataforma. Solo visible para Fabián/admin.</p></div>
+        <div style="max-width:720px;display:grid;grid-template-columns:1fr;gap:14px;">
+          <div class="dcard" style="border-radius:14px;padding:18px;">
+            <div class="dcard-title"><span>🌱</span>Cálculo del embarazo</div>
+            <div id="pregConfigMini" style="font-size:13px;color:var(--dim);line-height:1.8;margin-bottom:12px;">Cargando configuración…</div>
+            <button class="btn btn-rose" onclick="abrirModalEmbarazo()">Editar cálculo del embarazo</button>
+          </div>
+          <div class="dcard" style="border-radius:14px;padding:18px;">
+            <div class="dcard-title"><span>👥</span>Administración</div>
+            <p style="font-size:13px;color:var(--dim);line-height:1.7;margin-bottom:12px;">Desde aquí puedes volver a gestión de usuarios para definir quién entra, qué secciones ve y qué notas recibe cada persona.</p>
+            <button class="btn btn-outline" onclick="navTo('acceso')">Ir a Acceso</button>
+          </div>
+          <div class="dcard" style="border-radius:14px;padding:18px;background:var(--sand-l);border-color:var(--sand-m);">
+            <div class="dcard-title"><span>✨</span>Inicio familiar</div>
+            <p style="font-size:13px;color:var(--sand-d);line-height:1.7;">La portada Inicio queda limpia para la familia: avance de Amelia, días restantes, próximos hitos, fotos y notas visibles según la audiencia configurada.</p>
+          </div>
+        </div>
+      </div>
+
       <!-- CARTAS A AMELIA -->
       <div class="sec" id="sec-mensajes">
         <div class="sec-hd"><h2>Cartas a Amelia</h2><p>Palabras que guardaremos para que lea cuando crezca. ♡</p></div>
@@ -752,6 +774,7 @@ h1,h2,h3,h4{font-family:'Fraunces',serif;font-weight:300;}
       <button class="mnbtn" id="mn-mensajes" onclick="navTo('mensajes')"><span class="mni">💌</span>Cartas</button>
       <button class="mnbtn" id="mn-medico" onclick="navTo('medico')"><span class="mni">🩺</span>Médico</button>
       <button class="mnbtn" id="mn-parto" onclick="navTo('parto')"><span class="mni">🗺️</span>Parto</button>
+      <button class="mnbtn" id="mn-ajustes" onclick="navTo('ajustes')" style="display:none"><span class="mni">⚙️</span>Ajustes</button>
     </div>
   </nav>
 </div>
@@ -1177,7 +1200,7 @@ onAuthStateChanged(auth, async user => {
     const av=document.getElementById('uav'); av.className='uav '+CU.av; av.textContent=CU.inicial;
     document.getElementById('uname').textContent=CU.nombre;
     // Mostrar sección acceso solo a admin
-    if(esAdmin()) document.getElementById('niAcceso').style.display='';
+    if(esAdmin()){ document.getElementById('niAcceso').style.display=''; const aj=document.getElementById('niAjustes'); if(aj) aj.style.display=''; const maj=document.getElementById('mn-ajustes'); if(maj) maj.style.display='flex'; }
     initListeners();
     aplicarPermisos();
     renderNotaAudiencia();
@@ -1213,6 +1236,10 @@ function updateCountdown(){
   document.getElementById('dwdesc').textContent=info.d;
   document.getElementById('dwpct').textContent=pct+'%';
   document.getElementById('dwbar').style.width=pct+'%';
+  const ima=document.getElementById('inicioMensajeAvance');
+  const isa=document.getElementById('inicioSubAvance');
+  if(ima) ima.textContent=`Semana ${sem}${calc.diaSemana?` + ${calc.diaSemana} días`:''}`;
+  if(isa) isa.textContent=`Amelia sigue creciendo. Faltan ${dias} días para la fecha probable de parto.`;
   renderPregConfigCard();
 }
 
@@ -1255,13 +1282,14 @@ window.guardarConfigEmbarazo=async function(){
 };
 // ── NAVEGAR ──────────────────────────────────────────────────
 window.navTo = function(sec){
+  if(sec==='ajustes' && !esAdmin()) sec='inicio';
+  const target=document.getElementById('sec-'+sec);
+  if(!target) return;
   document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
   document.querySelectorAll('.mnbtn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('sec-'+sec).classList.add('active');
-  const map=['inicio','eventos','tareas','hitos','galeria','notas','lista','mensajes','medico','parto','acceso'];
-  const idx=map.indexOf(sec);
-  if(idx>=0) document.querySelectorAll('.ni')[idx].classList.add('active');
+  target.classList.add('active');
+  const ni=document.querySelector(`.ni[onclick*="navTo('${sec}')"]`); if(ni) ni.classList.add('active');
   const mb=document.getElementById('mn-'+sec); if(mb) mb.classList.add('active');
   document.getElementById('mainEl').scrollTop=0;
   if(sec==='eventos') mostrarListaEv();
@@ -1295,7 +1323,7 @@ function getRol(){
 function getSecciones(){
   if(!CU) return [];
   const e = (CU.email||'').toLowerCase().trim();
-  if(USUARIOS_BASE[e]) return ['inicio','eventos','tareas','hitos','galeria','notas','lista','mensajes','medico','parto'];
+  if(USUARIOS_BASE[e]) return USUARIOS_BASE[e].admin ? ['inicio','eventos','tareas','hitos','galeria','notas','lista','mensajes','medico','parto','ajustes'] : ['inicio','eventos','tareas','hitos','galeria','notas','lista','mensajes','medico','parto'];
   const u = Object.values(dUsuarios||{}).find(u=>(u.email||'').toLowerCase().trim()===e);
   if(!u) return [];
   if(u.rol==='editor') return ['inicio','eventos','tareas','hitos','galeria','notas','lista','mensajes','medico','parto'];
@@ -1307,7 +1335,7 @@ function puedeVer(sec){ return getSecciones().includes(sec); }
 
 function aplicarPermisos(){
   const secs = getSecciones();
-  const mapSec = ['inicio','eventos','tareas','hitos','galeria','notas','lista','mensajes','medico','parto'];
+  const mapSec = ['inicio','eventos','tareas','hitos','galeria','notas','lista','mensajes','medico','parto','ajustes'];
   mapSec.forEach(s=>{
     const ni = document.querySelector(`.ni[onclick*="navTo('${s}')"]`);
     const mn = document.getElementById('mn-'+s);
@@ -1317,6 +1345,10 @@ function aplicarPermisos(){
   // Mostrar acceso solo admin
   const niA=document.getElementById('niAcceso');
   if(niA) niA.style.display=esAdmin()?'':'none';
+  const niAj=document.getElementById('niAjustes');
+  const mnAj=document.getElementById('mn-ajustes');
+  if(niAj) niAj.style.display=esAdmin()?'':'none';
+  if(mnAj) mnAj.style.display=esAdmin()?'flex':'none';
   // Botón nuevo álbum
   const bna=document.getElementById('btnNuevoAlbum');
   if(bna) bna.style.display=getRol()!=='familia'?'':'none';
