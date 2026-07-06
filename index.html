@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- VERSION: v8_eventos_botones_clickables_2026-07-06 -->
+<!-- VERSION: v9_eventos_funciones_seguras_reales_2026-07-06 -->
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -441,6 +441,13 @@ h1,h2,h3,h4{font-family:'Fraunces',serif;font-weight:300;}
   pointer-events:auto;
 }
 
+
+/* FIX EVENTOS: botones siempre clickeables */
+.ev-det-hdr,.evcard{position:relative;overflow:hidden;}
+.ev-det-hdr::before,.ev-det-hdr::after,.evcard::before,.evcard::after{pointer-events:none !important;}
+.ev-det-actions{position:relative;z-index:50;pointer-events:auto;}
+.ev-det-actions button{position:relative;z-index:51;pointer-events:auto;}
+
 </style>
 </head>
 <body>
@@ -574,7 +581,7 @@ h1,h2,h3,h4{font-family:'Fraunces',serif;font-weight:300;}
         <div id="evLista">
           <div class="sec-hd"><h2>Eventos</h2><p>Organiza cada celebración con su propio espacio.</p></div>
           <div style="display:flex;justify-content:flex-end;margin-bottom:16px;">
-            <button class="btn btn-rose" onclick="abrirModalEvento()">+ Nuevo evento</button>
+            <button class="btn btn-rose" onclick="window.abrirModalEvento()">+ Nuevo evento</button>
           </div>
           <div class="evgrid" id="evGrid"></div>
         </div>
@@ -1804,6 +1811,52 @@ function setupDzEv(evId){
 }
 
 // CRUD EVENTOS
+
+window.editarEvSeguro = function(id){
+  try{
+    if(!id || !dEventos[id]){
+      toast('No encontré este evento para editar');
+      return;
+    }
+    window.abrirModalEvento(id);
+  }catch(err){
+    console.error('Error al abrir el editor de evento:', err);
+    toast('No se pudo abrir el editor');
+  }
+};
+
+window.eliminarEvSeguro = async function(id){
+  try{
+    if(!id || !dEventos[id]){
+      toast('No encontré este evento para eliminar');
+      return;
+    }
+    const ev = dEventos[id];
+    const ok = confirm(`¿Eliminar "${ev.nombre || 'este evento'}"?\n\nSe eliminará el evento y sus tareas vinculadas.`);
+    if(!ok) return;
+
+    const updates = {};
+    updates['eventos/' + id] = null;
+
+    Object.entries(dTareas || {}).forEach(([tid, t]) => {
+      if(t.evId === id) updates['tareas/' + tid] = null;
+    });
+
+    Object.entries(dGaleria || {}).forEach(([fid, f]) => {
+      if(f.evId === id) updates['galeria/' + fid + '/evId'] = null;
+    });
+
+    await update(ref(db), updates);
+    evActual = null;
+    mostrarListaEv();
+    toast('Evento eliminado ✓');
+  }catch(err){
+    console.error('Error al eliminar evento:', err);
+    toast('No se pudo eliminar el evento');
+  }
+};
+
+
 window.abrirModalEvento = function(id){
   evEditing=id||null;
   document.getElementById('mEtitle').textContent=id?'Editar evento':'Nuevo evento';
@@ -1820,7 +1873,7 @@ window.abrirModalEvento = function(id){
     document.getElementById('eVis').value=ev.visibilidad||'todos';
     icoSel=ev.ico||'🎀';
     document.querySelectorAll('.iopt').forEach(o=>o.classList.toggle('sel',o.textContent.trim()===icoSel));
-    window.window.window.renderEventoAudiencia(ev.visiblePara||[]);
+    window.renderEventoAudiencia(ev.visiblePara||[]);
   } else {
     document.getElementById('eNombre').value='';
     document.getElementById('eDesc').value='';
@@ -1830,7 +1883,7 @@ window.abrirModalEvento = function(id){
     document.getElementById('eVis').value='todos';
     selH.value=''; icoSel='🎀';
     document.querySelectorAll('.iopt').forEach((o,i)=>o.classList.toggle('sel',i===0));
-    window.window.window.renderEventoAudiencia([]);
+    window.renderEventoAudiencia([]);
   }
   const modalEvento=document.getElementById('mEvento'); if(modalEvento){ modalEvento.style.display='flex'; modalEvento.classList.add('on'); }
 };
