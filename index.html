@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- VERSION: v4_inicio_familiar_ajustes_privados_2026-07-02 -->
+<!-- VERSION: v5_compartir_eventos_personas_2026-07-04 -->
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -407,6 +407,16 @@ h1,h2,h3,h4{font-family:'Fraunces',serif;font-weight:300;}
   .sec{padding:14px;}
   .toast{bottom:82px;right:10px;left:10px;}
 }
+
+/* VISIBILIDAD / COMPARTIR */
+.share-box{background:var(--bg2);border:1px solid var(--bdr);border-radius:12px;padding:10px;margin-top:4px;}
+.share-users{display:none;margin-top:8px;}
+.share-users.on{display:block;}
+.share-chip{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--bdr);background:var(--w);border-radius:999px;padding:6px 9px;margin:3px;font-size:11px;color:var(--ink2);cursor:pointer;user-select:none;}
+.share-chip.on{background:var(--rose-l);border-color:var(--rose-m);color:var(--rose-d);font-weight:500;}
+.scope-badge{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:4px 8px;font-size:10px;font-weight:500;background:rgba(255,255,255,.14);color:rgba(255,255,255,.75);border:1px solid rgba(255,255,255,.12);}
+.evcard-scope{font-size:10px;color:var(--dim);margin-top:5px;}
+
 </style>
 </head>
 <body>
@@ -810,6 +820,17 @@ h1,h2,h3,h4{font-family:'Fraunces',serif;font-weight:300;}
       </select>
     </div>
     <div class="frow"><label>Vincular a hito</label><select id="eHito"><option value="">Sin vincular</option></select></div>
+    <div class="frow">
+      <label>Compartir este proyecto / evento</label>
+      <div class="share-box">
+        <select id="eVis" onchange="renderEventoAudiencia()">
+          <option value="todos">Todos los usuarios con acceso</option>
+          <option value="solo">Solo yo</option>
+          <option value="usuarios">Personas específicas</option>
+        </select>
+        <div id="eUsuarios" class="share-users"></div>
+      </div>
+    </div>
     <div class="mactions">
       <button class="btn btn-outline" onclick="cerrarModalEvento()">Cancelar</button>
       <button class="btn btn-rose" onclick="guardarEvento()">Guardar</button>
@@ -1069,6 +1090,49 @@ function etiquetaVisNota(n){
   return '👥 '+(nombres.length?nombres.join(', '):'Usuarios seleccionados');
 }
 
+function puedeVerItem(item, lugar='lista'){
+  if(!CU) return false;
+  if(esAdmin()) return true;
+  const email = normEmail(CU.email);
+  const vis = item?.visibilidad || 'todos';
+  if(vis==='todos') return true;
+  const visibles = (item?.visiblePara||[]).map(normEmail);
+  const autor = normEmail(item?.email || item?.creadoPorEmail || item?.autorEmail || '');
+  if(vis==='solo') return visibles.includes(email) || autor===email;
+  if(vis==='usuarios') return visibles.includes(email) || autor===email;
+  return true;
+}
+function puedeVerEvento(ev){ return puedeVerItem(ev,'evento'); }
+function etiquetaVisItem(item){
+  const vis = item?.visibilidad || 'todos';
+  if(vis==='todos') return '🌎 Todos';
+  if(vis==='solo') return '🔒 Solo yo';
+  const nombres = (item?.visiblePara||[]).map(e=>getAutorInfo(e).nombre).filter(Boolean);
+  return '👥 '+(nombres.length?nombres.join(', '):'Personas específicas');
+}
+function tieneEventosCompartidos(){
+  if(!CU) return false;
+  return Object.values(dEventos||{}).some(ev=>puedeVerEvento(ev));
+}
+function renderUserChips(containerId, cls, selected=[]){
+  const box=document.getElementById(containerId);
+  if(!box) return;
+  const sel=(selected||[]).map(normEmail);
+  const users=getUsuariosAudiencia();
+  box.innerHTML=`
+    <div style="font-size:11px;color:var(--dim);margin-bottom:6px;font-weight:500;">Elegir personas:</div>
+    <div>${users.map(u=>{
+      const checked=sel.length?sel.includes(normEmail(u.email)):false;
+      return `<label class="share-chip ${checked?'on':''}"><input type="checkbox" class="${cls}" value="${esc(u.email)}" ${checked?'checked':''} style="display:none"> ${esc(u.nombre)}</label>`;
+    }).join('')}</div>
+    <div style="font-size:10px;color:var(--dim);margin-top:6px;">Consejo: agrega primero a la persona en Acceso. Después aparecerá aquí.</div>
+  `;
+  box.querySelectorAll('label').forEach(l=>l.addEventListener('click',()=>{
+    const input=l.querySelector('input');
+    setTimeout(()=>l.classList.toggle('on',input.checked),0);
+  }));
+}
+
 function parseDateLocal(s){
   if(!s) return null;
   const [y,m,d] = s.split('-').map(Number);
@@ -1303,7 +1367,7 @@ function initListeners(){
   onValue(ref(db,'galeria'),s=>{ dGaleria=s.val()||{}; if(albumActual) abrirAlbum(albumActual); else renderAlbumsGrid(); updateStats(); });
   onValue(ref(db,'albumes'),s=>{ dAlbumes=s.val()||{}; if(!albumActual) renderAlbumsGrid(); });
   onValue(ref(db,'lista'),s=>{ dLista=s.val()||{}; renderLista(); if(!s.val()) sembrarLista(); });
-  onValue(ref(db,'eventos'),s=>{ dEventos=s.val()||{}; renderEvsGrid(); renderDashEv(); updateStats(); });
+  onValue(ref(db,'eventos'),s=>{ dEventos=s.val()||{}; renderEvsGrid(); renderDashEv(); updateStats(); aplicarPermisos(); });
   onValue(ref(db,'acceso'),s=>{ dUsuarios=s.val()||{}; if(esAdmin()) renderUsuariosList(); aplicarPermisos(); renderNotaAudiencia(); });
   onValue(ref(db,'mensajes'),s=>{ dMensajes=s.val()||{}; renderMensajes(); });
   onValue(ref(db,'medico'),s=>{ dMedico=s.val()||{}; renderMedico(); });
@@ -1325,9 +1389,9 @@ function getSecciones(){
   const e = (CU.email||'').toLowerCase().trim();
   if(USUARIOS_BASE[e]) return USUARIOS_BASE[e].admin ? ['inicio','eventos','tareas','hitos','galeria','notas','lista','mensajes','medico','parto','ajustes'] : ['inicio','eventos','tareas','hitos','galeria','notas','lista','mensajes','medico','parto'];
   const u = Object.values(dUsuarios||{}).find(u=>(u.email||'').toLowerCase().trim()===e);
-  if(!u) return [];
+  if(!u){ return tieneEventosCompartidos()?['inicio','eventos','hitos','galeria','mensajes']:[]; }
   if(u.rol==='editor') return ['inicio','eventos','tareas','hitos','galeria','notas','lista','mensajes','medico','parto'];
-  if(u.rol==='familia') return ['inicio','hitos','galeria','mensajes'];
+  if(u.rol==='familia'){ const secs=['inicio','hitos','galeria','mensajes']; if(tieneEventosCompartidos()) secs.splice(1,0,'eventos'); return secs; }
   return u.secciones || ['inicio','hitos','galeria'];
 }
 
@@ -1379,6 +1443,15 @@ window.renderNotaAudiencia = function(){
     const input=l.querySelector('input');
     setTimeout(()=>l.classList.toggle('on',input.checked),0);
   }));
+};
+
+window.renderEventoAudiencia = function(selected=[]){
+  const sel=document.getElementById('eVis');
+  const box=document.getElementById('eUsuarios');
+  if(!sel||!box) return;
+  if(sel.value!=='usuarios'){ box.classList.remove('on'); box.innerHTML=''; return; }
+  box.classList.add('on');
+  renderUserChips('eUsuarios','eventoUserChk',selected);
 };
 
 function renderUsuariosList(){
@@ -1474,7 +1547,7 @@ function mostrarListaEv(){
 
 function renderEvsGrid(){
   const g=document.getElementById('evGrid');
-  const items=Object.entries(dEventos);
+  const items=Object.entries(dEventos).filter(([,ev])=>puedeVerEvento(ev));
   if(!items.length){ g.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="empty-icon">🎀</div><h4>Sin eventos aún</h4><p>Crea el primero, como el Baby Shower.</p></div>'; return; }
   g.innerHTML=items.map(([id,ev])=>{
     const ta=Object.values(dTareas).filter(t=>t.evId===id);
@@ -1490,7 +1563,7 @@ function renderEvsGrid(){
         <div class="evcard-name">${esc(ev.nombre||'')}</div>
         <div class="evcard-fecha">📅 ${esc(fd)}</div>
         <span class="ev-estado ${ecls}">${elbl}</span>
-        ${hv?`<div class="ev-hbadge">🌟 ${esc(hv)}</div>`:''}
+        ${hv?`<div class="ev-hbadge">🌟 ${esc(hv)}</div>`:''}<div class="evcard-scope">${etiquetaVisItem(ev)}</div>
       </div>
       <div class="evcard-body">
         <div class="ev-prog"><div class="ev-progf" style="width:${pct}%"></div></div>
@@ -1502,7 +1575,7 @@ function renderEvsGrid(){
 
 function renderDashEv(){
   const el=document.getElementById('devents');
-  const items=Object.entries(dEventos).map(([id,ev])=>({...ev,id})).filter(ev=>ev.estado!=='completado').sort((a,b)=>(a.fechaExacta||'z')>(b.fechaExacta||'z')?1:-1).slice(0,3);
+  const items=Object.entries(dEventos).map(([id,ev])=>({...ev,id})).filter(ev=>puedeVerEvento(ev)&&ev.estado!=='completado').sort((a,b)=>(a.fechaExacta||'z')>(b.fechaExacta||'z')?1:-1).slice(0,3);
   if(!items.length){ el.innerHTML='<div style="font-size:12px;color:var(--dim)">Sin eventos próximos</div>'; return; }
   el.innerHTML=items.map(ev=>{
     const fd=ev.fechaExacta?fFecha(ev.fechaExacta):(ev.fechaTent||'Por confirmar');
@@ -1515,7 +1588,7 @@ function renderDashEv(){
 
 window.abrirEv = function(id){
   evActual=id;
-  const ev=dEventos[id]; if(!ev) return;
+  const ev=dEventos[id]; if(!ev) return; if(!puedeVerEvento(ev)){ toast('No tienes acceso a este proyecto'); mostrarListaEv(); return; }
   document.getElementById('evLista').style.display='none';
   const det=document.getElementById('evDetalle'); det.style.display='block';
   const fd=ev.fechaExacta?fLarga2(ev.fechaExacta):(ev.fechaTent||'Fecha por confirmar');
@@ -1530,7 +1603,7 @@ window.abrirEv = function(id){
           <div class="ev-det-icon">${ev.ico||'🎀'}</div>
           <div class="ev-det-name">${esc(ev.nombre||'')}</div>
           <div class="ev-det-fecha">📅 ${esc(fd)}</div>
-          ${ev.desc?`<div style="font-size:12px;color:rgba(255,255,255,.35);margin-top:5px">${esc(ev.desc)}</div>`:''}
+          ${ev.desc?`<div style="font-size:12px;color:rgba(255,255,255,.35);margin-top:5px">${esc(ev.desc)}</div>`:''}<div style="margin-top:8px"><span class="scope-badge">${etiquetaVisItem(ev)}</span></div>
         </div>
         <div style="display:flex;gap:5px;flex-shrink:0;">
           <button class="btn btn-outline btn-sm" style="border-color:rgba(255,255,255,.2);color:rgba(255,255,255,.7)" onclick="abrirModalEvento('${id}')">✏️ Editar</button>
@@ -1716,16 +1789,20 @@ window.abrirModalEvento = function(id){
     document.getElementById('eFechaExact').value=ev.fechaExacta||'';
     document.getElementById('eEstado').value=ev.estado||'planificando';
     selH.value=ev.hitoId||'';
+    document.getElementById('eVis').value=ev.visibilidad||'todos';
     icoSel=ev.ico||'🎀';
     document.querySelectorAll('.iopt').forEach(o=>o.classList.toggle('sel',o.textContent.trim()===icoSel));
+    renderEventoAudiencia(ev.visiblePara||[]);
   } else {
     document.getElementById('eNombre').value='';
     document.getElementById('eDesc').value='';
     document.getElementById('eFechaTent').value='';
     document.getElementById('eFechaExact').value='';
     document.getElementById('eEstado').value='planificando';
+    document.getElementById('eVis').value='todos';
     selH.value=''; icoSel='🎀';
     document.querySelectorAll('.iopt').forEach((o,i)=>o.classList.toggle('sel',i===0));
+    renderEventoAudiencia([]);
   }
   document.getElementById('mEvento').classList.add('on');
 };
@@ -1735,6 +1812,13 @@ window.selIco=function(el,ico){ icoSel=ico; document.querySelectorAll('.iopt').f
 window.guardarEvento=async function(){
   const nombre=document.getElementById('eNombre').value.trim();
   if(!nombre){ toast('Escribe el nombre del evento'); return; }
+  const vis=document.getElementById('eVis')?.value||'todos';
+  let visiblePara=[];
+  if(vis==='solo') visiblePara=[normEmail(CU?.email)];
+  if(vis==='usuarios'){
+    visiblePara=[...document.querySelectorAll('.eventoUserChk:checked')].map(i=>normEmail(i.value));
+    if(CU?.email&&!visiblePara.includes(normEmail(CU.email))) visiblePara.push(normEmail(CU.email));
+  }
   const data={
     nombre, desc:document.getElementById('eDesc').value.trim(),
     ico:icoSel,
@@ -1742,7 +1826,12 @@ window.guardarEvento=async function(){
     fechaExacta:document.getElementById('eFechaExact').value,
     estado:document.getElementById('eEstado').value,
     hitoId:document.getElementById('eHito').value||null,
+    visibilidad:vis,
+    visiblePara,
+    autor:CU?.nombre||'',
+    email:normEmail(CU?.email),
     creadoEn:evEditing?(dEventos[evEditing]?.creadoEn||new Date().toISOString()):new Date().toISOString(),
+    actualizadoEn:new Date().toISOString(),
   };
   const r=evEditing?ref(db,'eventos/'+evEditing):push(ref(db,'eventos'));
   await set(r,data);
