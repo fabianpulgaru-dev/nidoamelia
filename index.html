@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- VERSION: v5_compartir_eventos_personas_2026-07-04 -->
+<!-- VERSION: v6_eventos_compartir_fix_2026-07-04 -->
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -823,7 +823,7 @@ h1,h2,h3,h4{font-family:'Fraunces',serif;font-weight:300;}
     <div class="frow">
       <label>Compartir este proyecto / evento</label>
       <div class="share-box">
-        <select id="eVis" onchange="renderEventoAudiencia()">
+        <select id="eVis" onchange="window.renderEventoAudiencia()">
           <option value="todos">Todos los usuarios con acceso</option>
           <option value="solo">Solo yo</option>
           <option value="usuarios">Personas específicas</option>
@@ -1449,7 +1449,11 @@ window.renderEventoAudiencia = function(selected=[]){
   const sel=document.getElementById('eVis');
   const box=document.getElementById('eUsuarios');
   if(!sel||!box) return;
-  if(sel.value!=='usuarios'){ box.classList.remove('on'); box.innerHTML=''; return; }
+  if(sel.value!=='usuarios'){
+    box.classList.remove('on');
+    box.innerHTML='';
+    return;
+  }
   box.classList.add('on');
   renderUserChips('eUsuarios','eventoUserChk',selected);
 };
@@ -1606,7 +1610,7 @@ window.abrirEv = function(id){
           ${ev.desc?`<div style="font-size:12px;color:rgba(255,255,255,.35);margin-top:5px">${esc(ev.desc)}</div>`:''}<div style="margin-top:8px"><span class="scope-badge">${etiquetaVisItem(ev)}</span></div>
         </div>
         <div style="display:flex;gap:5px;flex-shrink:0;">
-          <button class="btn btn-outline btn-sm" style="border-color:rgba(255,255,255,.2);color:rgba(255,255,255,.7)" onclick="abrirModalEvento('${id}')">✏️ Editar</button>
+          <button class="btn btn-outline btn-sm" style="border-color:rgba(255,255,255,.2);color:rgba(255,255,255,.7)" onclick="event.stopPropagation();window.abrirModalEvento('${id}')">✏️ Editar</button>
           <button class="btn btn-sm" style="background:rgba(200,50,50,.3);color:#ffaaaa;border:none" onclick="eliminarEv('${id}')">✕</button>
         </div>
       </div>
@@ -1649,7 +1653,7 @@ function renderEvDetalles(id,ev,pct,done,total){
     <div class="dcard"><div class="dcard-title">Estado y fecha</div>
       <span class="ev-estado ${ecls}">${elbl}</span>
       ${ev.fechaTent?`<div style="font-size:12px;color:var(--dim);margin-top:7px">📅 Tentativa: ${esc(ev.fechaTent)}</div>`:''}
-      ${ev.fechaExacta?`<div style="font-size:12px;color:var(--ink);font-weight:500;margin-top:3px">📅 Confirmada: ${fLarga2(ev.fechaExacta)}</div>`:`<button class="btn btn-outline btn-sm" style="margin-top:8px" onclick="abrirModalEvento('${id}')">Confirmar fecha</button>`}
+      ${ev.fechaExacta?`<div style="font-size:12px;color:var(--ink);font-weight:500;margin-top:3px">📅 Confirmada: ${fLarga2(ev.fechaExacta)}</div>`:`<button class="btn btn-outline btn-sm" style="margin-top:8px" onclick="event.stopPropagation();window.abrirModalEvento('${id}')">Confirmar fecha</button>`}
     </div>
   </div>
   ${hv?`<div style="background:var(--sage-l);border:1px solid var(--sage-m);border-radius:9px;padding:11px 13px;display:flex;align-items:center;gap:9px">
@@ -1792,7 +1796,7 @@ window.abrirModalEvento = function(id){
     document.getElementById('eVis').value=ev.visibilidad||'todos';
     icoSel=ev.ico||'🎀';
     document.querySelectorAll('.iopt').forEach(o=>o.classList.toggle('sel',o.textContent.trim()===icoSel));
-    renderEventoAudiencia(ev.visiblePara||[]);
+    window.window.renderEventoAudiencia(ev.visiblePara||[]);
   } else {
     document.getElementById('eNombre').value='';
     document.getElementById('eDesc').value='';
@@ -1802,7 +1806,7 @@ window.abrirModalEvento = function(id){
     document.getElementById('eVis').value='todos';
     selH.value=''; icoSel='🎀';
     document.querySelectorAll('.iopt').forEach((o,i)=>o.classList.toggle('sel',i===0));
-    renderEventoAudiencia([]);
+    window.window.renderEventoAudiencia([]);
   }
   document.getElementById('mEvento').classList.add('on');
 };
