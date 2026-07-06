@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- VERSION: v6_eventos_compartir_fix_2026-07-04 -->
+<!-- VERSION: v7_eventos_editar_eliminar_fix_2026-07-04 -->
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -1610,8 +1610,8 @@ window.abrirEv = function(id){
           ${ev.desc?`<div style="font-size:12px;color:rgba(255,255,255,.35);margin-top:5px">${esc(ev.desc)}</div>`:''}<div style="margin-top:8px"><span class="scope-badge">${etiquetaVisItem(ev)}</span></div>
         </div>
         <div style="display:flex;gap:5px;flex-shrink:0;">
-          <button class="btn btn-outline btn-sm" style="border-color:rgba(255,255,255,.2);color:rgba(255,255,255,.7)" onclick="event.stopPropagation();window.abrirModalEvento('${id}')">✏️ Editar</button>
-          <button class="btn btn-sm" style="background:rgba(200,50,50,.3);color:#ffaaaa;border:none" onclick="eliminarEv('${id}')">✕</button>
+          <button type="button" class="btn btn-outline btn-sm" style="border-color:rgba(255,255,255,.2);color:rgba(255,255,255,.7)" onclick="event.preventDefault();event.stopPropagation();window.editarEvSeguro('${id}')">✏️ Editar</button>
+          <button type="button" class="btn btn-sm" style="background:rgba(200,50,50,.3);color:#ffaaaa;border:none" onclick="event.preventDefault();event.stopPropagation();window.eliminarEvSeguro('${id}')">✕</button>
         </div>
       </div>
     </div>
@@ -1796,7 +1796,7 @@ window.abrirModalEvento = function(id){
     document.getElementById('eVis').value=ev.visibilidad||'todos';
     icoSel=ev.ico||'🎀';
     document.querySelectorAll('.iopt').forEach(o=>o.classList.toggle('sel',o.textContent.trim()===icoSel));
-    window.window.renderEventoAudiencia(ev.visiblePara||[]);
+    window.window.window.renderEventoAudiencia(ev.visiblePara||[]);
   } else {
     document.getElementById('eNombre').value='';
     document.getElementById('eDesc').value='';
@@ -1806,11 +1806,11 @@ window.abrirModalEvento = function(id){
     document.getElementById('eVis').value='todos';
     selH.value=''; icoSel='🎀';
     document.querySelectorAll('.iopt').forEach((o,i)=>o.classList.toggle('sel',i===0));
-    window.window.renderEventoAudiencia([]);
+    window.window.window.renderEventoAudiencia([]);
   }
-  document.getElementById('mEvento').classList.add('on');
+  const modalEvento=document.getElementById('mEvento'); if(modalEvento){ modalEvento.style.display='flex'; modalEvento.classList.add('on'); }
 };
-window.cerrarModalEvento=()=>document.getElementById('mEvento').classList.remove('on');
+window.cerrarModalEvento=()=>{ const m=document.getElementById('mEvento'); if(m){ m.classList.remove('on'); m.style.display=''; } };
 window.selIco=function(el,ico){ icoSel=ico; document.querySelectorAll('.iopt').forEach(o=>o.classList.remove('sel')); el.classList.add('sel'); };
 
 window.guardarEvento=async function(){
@@ -1843,11 +1843,7 @@ window.guardarEvento=async function(){
   if(evEditing&&evActual===evEditing) setTimeout(()=>abrirEv(evEditing),300);
 };
 
-window.eliminarEv=async function(id){
-  if(!confirm('¿Eliminar este evento?')) return;
-  await remove(ref(db,'eventos/'+id));
-  mostrarListaEv(); toast('Evento eliminado');
-};
+window.eliminarEv = window.eliminarEvSeguro;
 
 // Ideas
 window.guardarIdea=async function(evId){
