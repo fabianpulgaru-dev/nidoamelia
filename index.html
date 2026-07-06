@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- VERSION: v7_eventos_editar_eliminar_fix_2026-07-04 -->
+<!-- VERSION: v8_eventos_botones_clickables_2026-07-06 -->
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -416,6 +416,30 @@ h1,h2,h3,h4{font-family:'Fraunces',serif;font-weight:300;}
 .share-chip.on{background:var(--rose-l);border-color:var(--rose-m);color:var(--rose-d);font-weight:500;}
 .scope-badge{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:4px 8px;font-size:10px;font-weight:500;background:rgba(255,255,255,.14);color:rgba(255,255,255,.75);border:1px solid rgba(255,255,255,.12);}
 .evcard-scope{font-size:10px;color:var(--dim);margin-top:5px;}
+
+
+/* FIX EVENTOS: capas decorativas no deben bloquear Editar/Eliminar */
+.ev-det-hdr,
+.evcard{
+  position:relative;
+  overflow:hidden;
+}
+.ev-det-hdr::before,
+.ev-det-hdr::after,
+.evcard::before,
+.evcard::after{
+  pointer-events:none !important;
+}
+.ev-det-actions{
+  position:relative;
+  z-index:20;
+  pointer-events:auto;
+}
+.ev-det-actions button{
+  position:relative;
+  z-index:21;
+  pointer-events:auto;
+}
 
 </style>
 </head>
@@ -1609,7 +1633,7 @@ window.abrirEv = function(id){
           <div class="ev-det-fecha">📅 ${esc(fd)}</div>
           ${ev.desc?`<div style="font-size:12px;color:rgba(255,255,255,.35);margin-top:5px">${esc(ev.desc)}</div>`:''}<div style="margin-top:8px"><span class="scope-badge">${etiquetaVisItem(ev)}</span></div>
         </div>
-        <div style="display:flex;gap:5px;flex-shrink:0;">
+        <div class="ev-det-actions" style="display:flex;gap:5px;flex-shrink:0;">
           <button type="button" class="btn btn-outline btn-sm" style="border-color:rgba(255,255,255,.2);color:rgba(255,255,255,.7)" onclick="event.preventDefault();event.stopPropagation();window.editarEvSeguro('${id}')">✏️ Editar</button>
           <button type="button" class="btn btn-sm" style="background:rgba(200,50,50,.3);color:#ffaaaa;border:none" onclick="event.preventDefault();event.stopPropagation();window.eliminarEvSeguro('${id}')">✕</button>
         </div>
@@ -1653,7 +1677,7 @@ function renderEvDetalles(id,ev,pct,done,total){
     <div class="dcard"><div class="dcard-title">Estado y fecha</div>
       <span class="ev-estado ${ecls}">${elbl}</span>
       ${ev.fechaTent?`<div style="font-size:12px;color:var(--dim);margin-top:7px">📅 Tentativa: ${esc(ev.fechaTent)}</div>`:''}
-      ${ev.fechaExacta?`<div style="font-size:12px;color:var(--ink);font-weight:500;margin-top:3px">📅 Confirmada: ${fLarga2(ev.fechaExacta)}</div>`:`<button class="btn btn-outline btn-sm" style="margin-top:8px" onclick="event.stopPropagation();window.abrirModalEvento('${id}')">Confirmar fecha</button>`}
+      ${ev.fechaExacta?`<div style="font-size:12px;color:var(--ink);font-weight:500;margin-top:3px">📅 Confirmada: ${fLarga2(ev.fechaExacta)}</div>`:`<button class="btn btn-outline btn-sm" style="margin-top:8px" onclick="event.preventDefault();event.stopPropagation();window.editarEvSeguro('${id}')">Confirmar fecha</button>`}
     </div>
   </div>
   ${hv?`<div style="background:var(--sage-l);border:1px solid var(--sage-m);border-radius:9px;padding:11px 13px;display:flex;align-items:center;gap:9px">
@@ -1661,7 +1685,7 @@ function renderEvDetalles(id,ev,pct,done,total){
     <div><div style="font-size:12px;font-weight:500;color:var(--sage-d)">Vinculado: ${esc(hv.nombre)}</div>
     <div style="font-size:11px;color:var(--sage-d);opacity:.7">Sem ${hv.semana||'—'} · ${hv.status==='done'?'Completado':hv.status==='next'?'Próximo':'Pendiente'}</div></div>
     <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="navTo('hitos')">Ver →</button>
-  </div>`:'<div style="font-size:12px;color:var(--dim);padding:7px 0">Sin hito vinculado. <button class="btn btn-ghost btn-sm" onclick="abrirModalEvento(\''+id+'\')">Vincular</button></div>'}`;
+  </div>`:'<div style="font-size:12px;color:var(--dim);padding:7px 0">Sin hito vinculado. <button class="btn btn-ghost btn-sm" onclick="event.preventDefault();event.stopPropagation();window.editarEvSeguro(\''+id+'\')">Vincular</button></div>'}`;
 }
 
 function renderEvTareas(evId){
