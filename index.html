@@ -2315,21 +2315,76 @@ window.eliminarAlbum=async function(id){
 };
 
 window.subirFotosAlbum=async function(files,albumId){
-  if(!files||!files.length) return;
-  toast('Subiendo '+files.length+' foto(s)…');
-  for(const file of Array.from(files)){
-    if(!file.type.startsWith('image/')) continue;
-    try{
-      const key=push(ref(db,'galeria')).key;
-      const ext = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g,'');
-      const sr=sref(storage,'galeria/'+key+(ext?'.'+ext:''));
-      const snap=await uploadBytes(sr,file);
-      const url=await getDownloadURL(snap.ref);
-      await set(ref(db,'galeria/'+key),{url,caption:'',fecha:new Date().toISOString(),autor:CU?.nombre||'',albumId:albumId});
-    }catch(e){ toast('Error: '+e.message); }
+  const lista = Array.from(files || []);
+  if(!lista.length) return;
+
+  if(!albumId || !dAlbumes[albumId]){
+    toast('No se encontró el álbum');
+    return;
   }
-  toast('Fotos guardadas ✓');
-  setTimeout(()=>abrirAlbum(albumId),500);
+
+  const extensionesImagen = new Set(['jpg','jpeg','png','gif','webp','heic','heif','avif']);
+  let subidas = 0;
+  let fallidas = 0;
+
+  toast('Subiendo '+lista.length+' foto(s)…');
+
+  for(const file of lista){
+    const ext = (file.name.split('.').pop() || '').toLowerCase().replace(/[^a-z0-9]/g,'');
+    const pareceImagen = (file.type && file.type.startsWith('image/')) || extensionesImagen.has(ext);
+
+    if(!pareceImagen){
+      fallidas++;
+      console.warn('Archivo omitido porque no parece imagen:', file.name, file.type);
+      continue;
+    }
+
+    try{
+      const key = push(ref(db,'galeria')).key;
+      if(!key) throw new Error('No se pudo generar el identificador de la foto');
+
+      const nombreStorage = 'galeria/'+key+(ext ? '.'+ext : '.jpg');
+      const sr = sref(storage,nombreStorage);
+
+      const metadata = {};
+      if(file.type) metadata.contentType = file.type;
+
+      const snap = await uploadBytes(sr,file,metadata);
+      const url = await getDownloadURL(snap.ref);
+
+      await set(ref(db,'galeria/'+key),{
+        url,
+        storagePath:nombreStorage,
+        caption:'',
+        nombreOriginal:file.name || '',
+        tipo:file.type || '',
+        fecha:new Date().toISOString(),
+        autor:CU?.nombre||'',
+        email:CU?.email||'',
+        albumId
+      });
+
+      subidas++;
+    }catch(e){
+      fallidas++;
+      console.error('Error subiendo foto:', file.name, e);
+      toast('Error al subir '+(file.name || 'una foto')+': '+(e?.message || e));
+    }
+  }
+
+  // Permite volver a elegir la misma foto si el usuario lo necesita.
+  const input = document.getElementById('fiAlbum_'+albumId);
+  if(input) input.value = '';
+
+  if(subidas && !fallidas){
+    toast(subidas===1 ? 'Foto guardada ✓' : subidas+' fotos guardadas ✓');
+  }else if(subidas && fallidas){
+    toast(subidas+' guardada(s) · '+fallidas+' con error');
+  }else{
+    toast('No se pudo guardar ninguna foto');
+  }
+
+  setTimeout(()=>abrirAlbum(albumId),300);
 };
 
 window.subirFotos=window.subirFotosAlbum; // compat
